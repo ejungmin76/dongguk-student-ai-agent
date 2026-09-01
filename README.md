@@ -49,3 +49,9 @@ python manage.py test --settings=config.settings.test
 - `config.settings.test`: 자동 테스트 설정
 
 민감한 값은 커밋하지 않습니다. 필요한 환경변수 이름만 `.env.example`에 기록합니다.
+
+## 아키텍처
+
+코드 배치, 계층별 책임, 의존 방향과 MCP 적용 경계는
+[`docs/architecture.md`](docs/architecture.md)에 정의되어 있습니다. 중요한 구조 결정은
+[`docs/decisions/`](docs/decisions/)에 ADR로 기록합니다.
