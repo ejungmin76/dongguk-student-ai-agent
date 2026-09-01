@@ -55,3 +55,6 @@ python manage.py test --settings=config.settings.test
 코드 배치, 계층별 책임, 의존 방향과 MCP 적용 경계는
 [`docs/architecture.md`](docs/architecture.md)에 정의되어 있습니다. 중요한 구조 결정은
 [`docs/decisions/`](docs/decisions/)에 ADR로 기록합니다.
+
+Tool과 Agent가 공유하는 상태, 오류, 출처, Action, 결과 envelope 규격은
+[`docs/common-schemas.md`](docs/common-schemas.md)에 정의되어 있습니다.
