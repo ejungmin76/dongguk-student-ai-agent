@@ -1,8 +1,10 @@
 import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parents[2]
+from dotenv import load_dotenv
 
+BASE_DIR = Path(__file__).resolve().parents[2]
+load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-local-development-only")
 DEBUG = False
 ALLOWED_HOSTS: list[str] = []
@@ -51,8 +53,12 @@ ASGI_APPLICATION = "config.asgi.application"
 # bootstrap issue runnable without external services.
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ["POSTGRES_DB"],
+        "USER": os.environ["POSTGRES_USER"],
+        "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+        "HOST": os.getenv("POSTGRES_HOST", "127.0.0.1"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
 
