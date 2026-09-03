@@ -61,6 +61,9 @@ class StudentAdmin(admin.ModelAdmin):
         "primary_major",
         "secondary_major",
         "current_semester",
+        "curriculum_year",
+        "program_track",
+        "reference_term",
         "status",
     )
     search_fields = (
@@ -71,16 +74,20 @@ class StudentAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "status",
+        "program_track",
+        "curriculum_year",
         "admission_year",
         "primary_major",
     )
     autocomplete_fields = (
         "primary_major",
         "secondary_major",
+        "reference_term",
     )
     list_select_related = (
         "primary_major",
         "secondary_major",
+        "reference_term",
     )
     readonly_fields = (
         "created_at",
@@ -96,6 +103,8 @@ class CourseAdmin(admin.ModelAdmin):
         "name",
         "default_credits",
         "offering_major",
+        "category",
+        "is_english",
         "status",
     )
     search_fields = (
@@ -106,6 +115,8 @@ class CourseAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "status",
+        "category",
+        "is_english",
         "offering_major",
     )
     autocomplete_fields = ("offering_major",)
@@ -236,6 +247,7 @@ class AcademicRecordAdmin(admin.ModelAdmin):
         "credits_earned",
         "is_passed",
         "attempt_number",
+        "is_replaced_by_retaking",
     )
     search_fields = (
         "student__student_number",
@@ -250,6 +262,7 @@ class AcademicRecordAdmin(admin.ModelAdmin):
         "term__semester",
         "grade",
         "is_passed",
+        "is_replaced_by_retaking",
         "course__offering_major",
     )
     autocomplete_fields = (

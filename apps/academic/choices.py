@@ -14,9 +14,20 @@ class StudentStatus(models.TextChoices):
     GRADUATED = "graduated", "졸업"
 
 
+class ProgramTrack(models.TextChoices):
+    GENERAL = "general", "일반과정"
+    ADVANCED = "advanced", "심화과정"
+
+
 class CourseStatus(models.TextChoices):
     ACTIVE = "active", "활성"
     INACTIVE = "inactive", "비활성"
+
+
+class CourseCategory(models.TextChoices):
+    MAJOR = "major", "전공"
+    BSM = "bsm", "BSM"
+    GENERAL = "general", "교양"
 
 
 class EnrollmentStatus(models.TextChoices):

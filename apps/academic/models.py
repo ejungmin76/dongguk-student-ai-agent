@@ -5,10 +5,12 @@ from django.db.models import F, Q
 
 from .choices import (
     CourseStatus,
+    CourseCategory,
     DayOfWeek,
     EnrollmentStatus,
     GradeCode,
     OfferingStatus,
+    ProgramTrack,
     Semester,
     StudentStatus,
 )
@@ -139,6 +141,25 @@ class Student(models.Model):
             MaxValueValidator(20),
         ],
     )
+    curriculum_year = models.PositiveSmallIntegerField(
+        "교육과정 적용연도",
+        default=2026,
+        validators=[MinValueValidator(2000), MaxValueValidator(2100)],
+    )
+    program_track = models.CharField(
+        "교육과정",
+        max_length=20,
+        choices=ProgramTrack.choices,
+        default=ProgramTrack.GENERAL,
+    )
+    reference_term = models.ForeignKey(
+        AcademicTerm,
+        verbose_name="시나리오 기준 학기",
+        on_delete=models.PROTECT,
+        related_name="reference_students",
+        null=True,
+        blank=True,
+    )
     status = models.CharField(
         "학적 상태",
         max_length=20,
@@ -172,6 +193,10 @@ class Student(models.Model):
                     current_semester__lte=20,
                 ),
                 name="student_current_semester_range",
+            ),
+            models.CheckConstraint(
+                condition=Q(curriculum_year__gte=2000, curriculum_year__lte=2100),
+                name="student_curriculum_year_range",
             ),
             models.CheckConstraint(
                 condition=(
@@ -209,6 +234,16 @@ class Course(models.Model):
         verbose_name="개설 전공",
         on_delete=models.PROTECT,
         related_name="courses",
+    )
+    category = models.CharField(
+        "이수 구분",
+        max_length=20,
+        choices=CourseCategory.choices,
+        default=CourseCategory.MAJOR,
+    )
+    is_english = models.BooleanField(
+        "영어 강의",
+        default=False,
     )
     status = models.CharField(
         "과목 상태",
@@ -523,6 +558,10 @@ class AcademicRecord(models.Model):
         "수강 차수",
         default=1,
         validators=[MinValueValidator(1)],
+    )
+    is_replaced_by_retaking = models.BooleanField(
+        "재수강으로 대체됨",
+        default=False,
     )
     created_at = models.DateTimeField(
         "생성일",

@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+from django.core.management import call_command
 from django.test import TestCase
 
 from .choices import GradeCode, Semester
@@ -119,3 +120,38 @@ class AcademicModelTests(TestCase):
 
         with self.assertRaises(ValidationError):
             record.full_clean()
+
+
+class SeedAcademicDataCommandTests(TestCase):
+    def test_seed_creates_safe_mock_scenarios_idempotently(self):
+        call_command("seed_academic_data", verbosity=0)
+        call_command("seed_academic_data", verbosity=0)
+
+        mock_students = Student.objects.filter(student_number__startswith="MOCK-")
+        self.assertEqual(mock_students.count(), 8)
+        self.assertTrue(Course.objects.filter(code="CSC2007", name="자료구조").exists())
+        self.assertTrue(Course.objects.filter(code="CSC4019", name="종합설계2").exists())
+        self.assertTrue(
+            mock_students.filter(secondary_major__code="DS").exists()
+        )
+        self.assertTrue(
+            mock_students.filter(status="leave").exists()
+        )
+        self.assertTrue(
+            AcademicRecord.objects.filter(is_replaced_by_retaking=True).exists()
+        )
+        retake_student = Student.objects.get(student_number="MOCK-2026-006")
+        self.assertEqual(
+            retake_student.academic_records.filter(course__code="CSC2002").count(),
+            2,
+        )
+        graduating_student = Student.objects.get(student_number="MOCK-2026-008")
+        earned = sum(
+            record.credits_earned
+            for record in graduating_student.academic_records.all()
+        )
+        self.assertGreaterEqual(earned, Decimal("110.0"))
+        self.assertGreaterEqual(graduating_student.enrollments.count(), 4)
+
+        for student in mock_students:
+            self.assertTrue(student.display_name.startswith("가상학생"))
