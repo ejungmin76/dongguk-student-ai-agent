@@ -59,11 +59,23 @@ class DjangoAcademicRepository:
         )
 
     def list_current_enrollments(self, student_number: str) -> tuple[EnrollmentDTO, ...]:
-        self._require_student(student_number)
+        try:
+            student = Student.objects.only("reference_term_id").get(
+                student_number=student_number
+            )
+        except Student.DoesNotExist as exc:
+            raise StudentNotFoundError(student_number) from exc
         enrollments = Enrollment.objects.filter(
-            student__student_number=student_number,
+            student=student,
             status=EnrollmentStatus.ENROLLED,
-        ).select_related("offering__course", "offering__term").prefetch_related(
+        )
+        if student.reference_term_id is not None:
+            enrollments = enrollments.filter(offering__term_id=student.reference_term_id)
+        else:
+            enrollments = enrollments.none()
+        enrollments = enrollments.select_related(
+            "offering__course", "offering__term"
+        ).prefetch_related(
             Prefetch(
                 "offering__meetings",
                 queryset=CourseMeeting.objects.order_by("day_of_week", "start_time"),
