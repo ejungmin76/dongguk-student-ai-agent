@@ -1,0 +1,367 @@
+catalog_version: 1
+reviewed_at: '2026-09-08'
+scope: dongguk_university_seoul_undergraduate
+
+defaults:
+  language: ko
+  campus: SEOUL
+  access: public
+  authentication_required: false
+  respect_robots_txt: true
+  request_interval_seconds: 3
+  max_concurrency_per_host: 1
+
+sources:
+  - id: dgu-academic-guide-2026
+    title: 2026학년도 신입생을 위한 학사제도 및 학업이수가이드
+    url: https://www.dongguk.edu/public/2026%ED%95%99%EB%85%84%EB%8F%84%20%EC%8B%A0%EC%9E%85%EC%83%9D%EC%9D%84%20%EC%9C%84%ED%95%9C%20%ED%95%99%EC%82%AC%EC%A0%9C%EB%8F%84%20%EB%B0%8F%20%ED%95%99%EC%97%85%EC%9D%B4%EC%88%98%EA%B0%80%EC%9D%B4%EB%93%9C_20260826.pdf
+    landing_url: https://www.dongguk.edu/page/137
+    publisher: 동국대학교 학사지원팀
+    type: pdf
+    category: [academic_calendar, enrollment, grades, registration, scholarship, student_status, multiple_major, graduation, general_education]
+    priority: P0
+    effective_year: 2026
+    refresh: annual_and_on_change
+    enabled: true
+    notes: 252쪽 통합 기준 문서. 입학연도별 교양 및 단과대학별 졸업기준을 section metadata로 분리한다.
+
+  - id: dgu-curriculum-index
+    title: 동국대학교 교육과정 안내서 목록
+    url: https://www.dongguk.edu/page/137
+    publisher: 동국대학교 학사지원팀
+    type: html_index
+    category: [curriculum, graduation]
+    priority: P0
+    refresh: monthly
+    enabled: true
+    notes: 연도별 학업이수가이드와 교과과정 PDF 발견용 canonical index.
+
+  - id: dgu-advanced-convergence-curriculum-2026
+    title: 2026학년도 첨단융합대학 교과과정
+    url: https://www.dongguk.edu/resources/files/curriculum/2026/10.%20%EC%B2%A8%EB%8B%A8%EC%9C%B5%ED%95%A9%EB%8C%80%ED%95%99.pdf
+    landing_url: https://www.dongguk.edu/page/137
+    publisher: 동국대학교
+    type: pdf
+    category: [curriculum, course, graduation]
+    priority: P0
+    effective_year: 2026
+    college: 첨단융합대학
+    refresh: annual_and_on_change
+    enabled: true
+
+  - id: dgu-computer-ai-curriculum-2026
+    title: 컴퓨터·AI학부 전공교육과정 2026
+    url: https://ai.dongguk.edu/page/32268
+    publisher: 동국대학교 첨단융합대학
+    type: html
+    category: [curriculum, prerequisite, graduation]
+    priority: P0
+    effective_year: 2026
+    college: 첨단융합대학
+    department: 컴퓨터·AI학부
+    refresh: monthly
+    enabled: true
+    notes: 심화/일반과정, 선수·후수, 설계학점, 필수과목을 별도 section으로 분리한다.
+
+  - id: dgu-computer-ai-curriculum-2025
+    title: 컴퓨터·AI학부 졸업요건 및 이수체계 2025
+    url: https://ai.dongguk.edu/article/notice/detail/194623
+    publisher: 동국대학교 첨단융합대학
+    type: html_notice
+    category: [curriculum, prerequisite, graduation]
+    priority: P1
+    effective_year: 2025
+    college: 첨단융합대학
+    department: 컴퓨터·AI학부
+    refresh: on_change
+    enabled: true
+    notes: 이미지 표는 OCR 후 수동 검증이 필요하다.
+
+  - id: dgu-ai-curriculum-archive-2024
+    title: AI융합대학 전공교육과정 안내 2024
+    url: https://cse.dongguk.edu/article/notice/detail/896
+    publisher: 동국대학교 컴퓨터·AI학부
+    type: html_notice_with_attachment
+    category: [curriculum, prerequisite, equivalent_course]
+    priority: P1
+    effective_year: 2024
+    college: AI융합대학
+    department: AI소프트웨어융합학부
+    refresh: on_change
+    enabled: true
+
+  - id: dgu-ai-curriculum-archive-2023
+    title: 전공교육과정 2023 및 전공별 이수체계도
+    url: https://ai.dongguk.edu/page/30448
+    publisher: 동국대학교 첨단융합대학
+    type: html
+    category: [curriculum, prerequisite]
+    priority: P2
+    effective_year: 2023
+    refresh: annual
+    enabled: false
+    notes: 과거 학번 질의 지원 시 활성화한다. 이미지 기반 체계도 검수가 필요하다.
+
+  - id: dgu-rules
+    title: 동국대학교 학칙·규칙 시스템
+    url: https://rule.dongguk.edu/
+    publisher: 동국대학교
+    type: html_index
+    category: [rule, academic_policy]
+    priority: P0
+    refresh: monthly
+    enabled: true
+    notes: 상세 규정 URL과 시행일·개정일을 보존한다. 수집 가능 여부를 실행 전에 수동 확인한다.
+
+  - id: dgu-academic-calendar
+    title: 동국대학교 학사일정
+    url: https://www.dongguk.edu/schedule/detail?schedule_info_seq=22
+    publisher: 동국대학교
+    type: html
+    category: [academic_calendar]
+    priority: P0
+    refresh: weekly
+    enabled: true
+    notes: 연도/월별 URL 동작을 수집기에서 확인하고 일정의 시작·종료일을 구조화한다.
+
+  - id: dgu-academic-notices
+    title: 동국대학교 학사공지
+    url: https://www.dongguk.edu/article/HAKSANOTICE/list
+    publisher: 동국대학교
+    type: html_index
+    category: [academic_notice]
+    priority: P0
+    refresh: daily
+    enabled: true
+    notes: 목록은 발견용. 상세 공지와 첨부파일을 별도 document로 저장하고 유효기간을 추출한다.
+
+  - id: dgu-scholarship-notices
+    title: 동국대학교 장학공지
+    url: https://www.dongguk.edu/article/JANGHAKNOTICE/list
+    publisher: 동국대학교
+    type: html_index
+    category: [scholarship_notice]
+    priority: P0
+    refresh: daily
+    enabled: true
+
+  - id: dgu-course-syllabus-search
+    title: 시간표 및 강의계획서
+    url: https://support.dongguk.edu/unis/index.do
+    publisher: 동국대학교
+    type: html_application
+    category: [course, timetable, syllabus]
+    priority: P1
+    refresh: each_semester
+    authentication_required: true
+    enabled: false
+    notes: 공식 홈페이지 링크가 로그인 화면으로 연결되므로 RAG 자동수집에서 제외한다. 공개 조회 경로가 확인될 때만 활성화한다.
+
+  - id: dgu-course-registration
+    title: 수강신청·정정·취소 안내
+    url: https://www.dongguk.edu/page/150
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [enrollment]
+    priority: P1
+    refresh: monthly
+    enabled: true
+
+  - id: dgu-retake
+    title: 재수강 안내
+    url: https://www.dongguk.edu/page/151
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [enrollment, grades, retake]
+    priority: P1
+    refresh: monthly
+    enabled: true
+
+  - id: dgu-grades
+    title: 성적 안내
+    url: https://www.dongguk.edu/page/154
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [grades]
+    priority: P1
+    refresh: monthly
+    enabled: true
+
+  - id: dgu-graduation
+    title: 수료 및 졸업 안내
+    url: https://www.dongguk.edu/page/158
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [graduation]
+    priority: P1
+    refresh: monthly
+    enabled: true
+
+  - id: dgu-major-selection
+    title: 전공결정 안내
+    url: https://www.dongguk.edu/page/161
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [major_selection]
+    priority: P1
+    refresh: each_semester
+    enabled: true
+
+  - id: dgu-multiple-major
+    title: 다전공 안내
+    url: https://www.dongguk.edu/page/162
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [multiple_major, minor, interdisciplinary_major]
+    priority: P1
+    refresh: each_semester
+    enabled: true
+
+  - id: dgu-summer-winter-session
+    title: 계절학기제 안내
+    url: https://www.dongguk.edu/page/163
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [enrollment, seasonal_semester]
+    priority: P1
+    refresh: each_semester
+    enabled: true
+
+  - id: dgu-major-change
+    title: 전과(전공변경)제 안내
+    url: https://www.dongguk.edu/page/164
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [major_change]
+    priority: P1
+    refresh: each_semester
+    enabled: true
+
+  - id: dgu-leave-return-dismissal
+    title: 휴학·복학·제적·퇴학 안내
+    url: https://www.dongguk.edu/page/165
+    publisher: 동국대학교 학사지원팀
+    type: html
+    category: [student_status, leave, return, dismissal]
+    priority: P1
+    refresh: each_semester
+    enabled: true
+
+  - id: dgu-tuition-payment
+    title: 등록금 납부 안내
+    url: https://www.dongguk.edu/page/144
+    publisher: 동국대학교 재무팀
+    type: html
+    category: [tuition, registration]
+    priority: P1
+    refresh: each_semester
+    enabled: true
+
+  - id: dgu-tuition-faq
+    title: 등록 관련 FAQ
+    url: https://www.dongguk.edu/page/146
+    publisher: 동국대학교 재무팀
+    type: html
+    category: [tuition, registration, scholarship]
+    priority: P1
+    refresh: each_semester
+    enabled: true
+
+  - id: dgu-scholarship-basics
+    title: 장학금을 받기 위해 알아야 할 사항
+    url: https://scholarship.dongguk.edu/page/2681
+    publisher: 동국대학교 장학팀
+    type: html
+    category: [scholarship]
+    priority: P1
+    refresh: monthly
+    enabled: true
+
+  - id: dgu-scholarship-application
+    title: 장학금 신청방법
+    url: https://scholarship.dongguk.edu/page/2682
+    publisher: 동국대학교 장학팀
+    type: html
+    category: [scholarship, application]
+    priority: P1
+    refresh: monthly
+    enabled: true
+
+  - id: dgu-scholarship-after-selection
+    title: 장학생 선발 후 FAQ
+    url: https://scholarship.dongguk.edu/page/2683
+    publisher: 동국대학교 장학팀
+    type: html
+    category: [scholarship, payment, leave]
+    priority: P1
+    refresh: monthly
+    enabled: true
+
+  - id: dgu-scholarship-types
+    title: 장학 분류
+    url: https://scholarship.dongguk.edu/page/2686
+    publisher: 동국대학교 장학팀
+    type: html
+    category: [scholarship]
+    priority: P1
+    refresh: annual
+    enabled: true
+
+  - id: dgu-scholarship-guidebook
+    title: 장학제도 가이드북
+    url: https://scholarship.dongguk.edu/page/2687
+    publisher: 동국대학교 장학팀
+    type: html_index
+    category: [scholarship]
+    priority: P1
+    refresh: annual
+    enabled: true
+    notes: 최신 PDF 링크를 landing page에서 발견한다.
+
+  - id: dgu-scholarship-contacts
+    title: 장학 담당부서 및 연락처
+    url: https://scholarship.dongguk.edu/page/2691
+    publisher: 동국대학교 장학팀
+    type: html
+    category: [scholarship, contact]
+    priority: P2
+    refresh: each_semester
+    enabled: true
+
+  - id: dgu-modular-curriculum-2026
+    title: 2026학년도 모듈형 교육과정
+    url: https://www.dongguk.edu/resources/files/curriculum/2026/18.%20%EB%AA%A8%EB%93%88%ED%98%95%EA%B5%90%EC%9C%A1%EA%B3%BC%EC%A0%95.pdf
+    landing_url: https://www.dongguk.edu/page/137
+    publisher: 동국대학교
+    type: pdf
+    category: [micro_degree, nano_degree, curriculum]
+    priority: P2
+    effective_year: 2026
+    refresh: annual
+    enabled: true
+
+  - id: dgu-academic-guide-2025
+    title: 2025학년도 학사제도 및 학업이수가이드
+    url: https://www.dongguk.edu/resources/pdf/hakup_Guide_2025.pdf
+    landing_url: https://www.dongguk.edu/page/137
+    publisher: 동국대학교 학사지원팀
+    type: pdf
+    category: [academic_policy, graduation, curriculum]
+    priority: P2
+    effective_year: 2025
+    refresh: never_unless_changed
+    enabled: false
+    notes: 직접 URL은 #14에서 확인 후 활성화한다. landing page를 canonical discovery source로 사용한다.
+
+  - id: dgu-academic-guide-2024
+    title: 2024학년도 학사제도 및 학업이수가이드
+    url: https://www.dongguk.edu/resources/pdf/hakup_Guide_2024.pdf
+    landing_url: https://www.dongguk.edu/page/137
+    publisher: 동국대학교 학사지원팀
+    type: pdf
+    category: [academic_policy, graduation, curriculum]
+    priority: P2
+    effective_year: 2024
+    refresh: never_unless_changed
+    enabled: false
+    notes: 과거 학번 질의 지원 시 활성화한다.
