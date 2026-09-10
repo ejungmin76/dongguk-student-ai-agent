@@ -14,8 +14,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--input-dir", type=Path, default=settings.BASE_DIR / "data" / "knowledge" / "cleaned")
         parser.add_argument("--output", type=Path, default=settings.BASE_DIR / "data" / "knowledge" / "chunks" / "chunks.jsonl")
-        parser.add_argument("--max-chars", type=int, default=1200)
-        parser.add_argument("--overlap-chars", type=int, default=150)
+        parser.add_argument("--max-chars", type=int, default=1000)
+        parser.add_argument("--overlap-chars", type=int, default=120)
 
     def handle(self, *args, **options):
         input_dir: Path = options["input_dir"]

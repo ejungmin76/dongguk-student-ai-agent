@@ -19,8 +19,8 @@ class ChunkingConfig(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    max_chars: int = Field(default=1200, ge=300, le=4000)
-    overlap_chars: int = Field(default=150, ge=0, le=1000)
+    max_chars: int = Field(default=1000, ge=300, le=4000)
+    overlap_chars: int = Field(default=120, ge=0, le=1000)
 
     @model_validator(mode="after")
     def overlap_must_be_smaller_than_chunk(self) -> "ChunkingConfig":
