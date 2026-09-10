@@ -110,8 +110,8 @@ sources:
     category: [rule, academic_policy]
     priority: P0
     refresh: monthly
-    enabled: true
-    notes: 상세 규정 URL과 시행일·개정일을 보존한다. 수집 가능 여부를 실행 전에 수동 확인한다.
+    enabled: false
+    notes: 공개 루트가 본문 텍스트를 제공하지 않는 웹앱이라 자동 수집에서 제외한다. 개별 규정 URL 또는 공식 API 수집기를 확보한 뒤 다시 활성화한다.
 
   - id: dgu-academic-calendar
     title: 동국대학교 학사일정
