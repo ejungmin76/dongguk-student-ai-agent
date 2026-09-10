@@ -28,8 +28,11 @@ class KeywordRetrieverTests(TestCase):
         )
         refresh_fts(KnowledgeChunk.objects.select_related("document").all())
 
-    def test_korean_terms_are_normalized_without_a_fixed_keyword_list(self):
-        self.assertEqual(keyword_terms("컴퓨터·AI학부 재수강 알려줘"), ["컴퓨터", "ai학부", "재수강"])
+    def test_terms_are_normalized_without_a_korean_stop_word_dictionary(self):
+        self.assertEqual(
+            keyword_terms("컴퓨터·AI학부 재수강 C+ A0 CSW1001 알려줘"),
+            ["컴퓨터", "ai학부", "재수강", "c+", "a0", "csw1001", "알려줘"],
+        )
 
     def test_exact_keyword_search_returns_matching_documents(self):
         results = KeywordRetriever().search("재수강")

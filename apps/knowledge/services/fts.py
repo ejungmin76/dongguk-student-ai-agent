@@ -14,8 +14,14 @@ from pydantic import BaseModel, ConfigDict
 from ..models import KnowledgeChunk
 
 
-TOKEN_RE = re.compile(r"[0-9a-z가-힣]{2,}", re.IGNORECASE)
-STOP_WORDS = {"알려줘", "알려주세요", "어떻게", "무엇", "대한", "관련", "있는", "해줘", "해주세요"}
+# No Korean stop-word dictionary is used. It would make retrieval behavior
+# depend on a hand-maintained list of expressions. These patterns only retain
+# syntactically meaningful academic forms: ordinary terms, grade codes, and
+# course codes.
+TOKEN_RE = re.compile(
+    r"[a-f][+-]|[a-f]0|[a-z]{2,}\d{3,}|[0-9a-z가-힣]{2,}",
+    re.IGNORECASE,
+)
 
 
 def keyword_terms(query: str) -> list[str]:
@@ -24,7 +30,7 @@ def keyword_terms(query: str) -> list[str]:
     normalized = unicodedata.normalize("NFKC", query).lower().replace("·", " ")
     terms: list[str] = []
     for term in TOKEN_RE.findall(normalized):
-        if term not in STOP_WORDS and term not in terms:
+        if term not in terms:
             terms.append(term)
     return terms
 
