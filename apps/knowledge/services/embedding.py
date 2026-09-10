@@ -20,6 +20,8 @@ class DocumentEmbedder(Protocol):
 
     def embed_documents(self, chunks: Sequence[ChunkPayload]) -> list[list[float]]: ...
 
+    def embed_query(self, query: str) -> list[float]: ...
+
 
 class GeminiDocumentEmbedder:
     """Official Google GenAI SDK adapter for retrieval-document embeddings."""
@@ -62,3 +64,21 @@ class GeminiDocumentEmbedder:
         if len(vectors) != len(chunks) or any(len(vector) != self.dimensions for vector in vectors):
             raise EmbeddingError("Gemini returned an unexpected embedding count or dimension.")
         return vectors
+
+    def embed_query(self, query: str) -> list[float]:
+        """Embed a student question in Gemini's asymmetric QA retrieval format."""
+
+        if not query.strip():
+            raise EmbeddingError("Query must not be blank.")
+        try:
+            response = self._client.models.embed_content(
+                model=self.model_name,
+                contents=f"task: question answering | query: {query.strip()}",
+                config=self._types.EmbedContentConfig(output_dimensionality=self.dimensions),
+            )
+            vector = list(response.embeddings[0].values)
+        except Exception as error:
+            raise EmbeddingError(f"Gemini query embedding request failed: {error}") from error
+        if len(vector) != self.dimensions:
+            raise EmbeddingError("Gemini returned an unexpected query embedding dimension.")
+        return vector
