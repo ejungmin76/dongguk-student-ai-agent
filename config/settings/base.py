@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "apps.core",
     "apps.academic.apps.AcademicConfig",
+    "apps.knowledge.apps.KnowledgeConfig",
 ]
 
 MIDDLEWARE = [
