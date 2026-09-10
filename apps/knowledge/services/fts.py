@@ -8,10 +8,11 @@ from datetime import date
 from typing import Iterable
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q, Value
 from pydantic import BaseModel, ConfigDict
 
-from ..models import KnowledgeChunk
+from ..models import KnowledgeChunk, KnowledgeTermAlias
 
 
 # No Korean stop-word dictionary is used. It would make retrieval behavior
@@ -48,6 +49,28 @@ def search_text_for(chunk: KnowledgeChunk) -> str:
     )
 
 
+def search_label_for(chunk: KnowledgeChunk) -> str:
+    """Short official labels are a safe target for typo tolerance."""
+
+    return " ".join([chunk.document.title, *chunk.heading_path])
+
+
+def expand_terms(query: str) -> list[str]:
+    """Expand only aliases approved in the database with a source URL."""
+
+    terms = keyword_terms(query)
+    aliases = KnowledgeTermAlias.objects.filter(
+        approval_status=KnowledgeTermAlias.ApprovalStatus.APPROVED
+    ).filter(Q(alias__in=terms) | Q(canonical_term__in=terms))
+    for item in aliases:
+        for term in (item.canonical_term, item.alias):
+            normalized = keyword_terms(term)
+            for value in normalized:
+                if value not in terms:
+                    terms.append(value)
+    return terms
+
+
 def refresh_fts(chunks: Iterable[KnowledgeChunk]) -> int:
     """Build PostgreSQL's simple-config FTS vectors for exact Korean tokens."""
 
@@ -64,6 +87,7 @@ def refresh_fts(chunks: Iterable[KnowledgeChunk]) -> int:
             + SearchVector(Value(chunk.content), config="simple", weight="D")
         )
         KnowledgeChunk.objects.filter(pk=chunk.pk).update(
+            search_label=search_label_for(chunk),
             search_text=text,
             search_vector=vector,
         )
@@ -98,7 +122,7 @@ class KeywordRetriever:
         effective_on: date | None = None,
         category: str | None = None,
     ) -> list[KeywordResult]:
-        terms = keyword_terms(query)
+        terms = expand_terms(query)
         if not terms:
             raise ValueError("query must contain at least one meaningful keyword")
         if not 1 <= top_k <= 20:
@@ -135,6 +159,35 @@ class KeywordRetriever:
                 heading_path=record.heading_path,
                 canonical_url=record.document.canonical_url,
                 content=record.content,
+            )
+            for record in records
+        ]
+
+
+class FuzzyRetriever:
+    """Typo-tolerant candidate discovery over titles and section names only."""
+
+    def search(self, query: str, *, top_k: int = 5) -> list[KeywordResult]:
+        terms = keyword_terms(query)
+        if not terms:
+            raise ValueError("query must contain at least one meaningful keyword")
+        if not 1 <= top_k <= 20:
+            raise ValueError("top_k must be between 1 and 20")
+        # Use the longest supplied term: it has the most typo-discriminating
+        # trigrams, without a Korean synonym or spelling dictionary in code.
+        term = max(terms, key=len)
+        records = (
+            KnowledgeChunk.objects.annotate(similarity=TrigramSimilarity("search_label", term))
+            .filter(similarity__gt=0)
+            .select_related("document")
+            .order_by("-similarity", "chunk_id")[:top_k]
+        )
+        return [
+            KeywordResult(
+                chunk_id=record.chunk_id, score=float(record.similarity), source_id=record.document.source_id,
+                document_title=record.document.title, effective_year=record.document.effective_year,
+                document_status=record.document.document_status, heading_path=record.heading_path,
+                canonical_url=record.document.canonical_url, content=record.content,
             )
             for record in records
         ]

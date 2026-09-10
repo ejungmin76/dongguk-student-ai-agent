@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import KnowledgeChunk, KnowledgeDocument
+from .models import KnowledgeChunk, KnowledgeDocument, KnowledgeTermAlias
 
 
 @admin.register(KnowledgeDocument)
@@ -15,3 +15,10 @@ class KnowledgeChunkAdmin(admin.ModelAdmin):
     search_fields = ("chunk_id", "content")
     autocomplete_fields = ("document",)
     readonly_fields = ("embedding",)
+
+
+@admin.register(KnowledgeTermAlias)
+class KnowledgeTermAliasAdmin(admin.ModelAdmin):
+    list_display = ("alias", "canonical_term", "approval_status", "updated_at")
+    list_filter = ("approval_status",)
+    search_fields = ("alias", "canonical_term")
