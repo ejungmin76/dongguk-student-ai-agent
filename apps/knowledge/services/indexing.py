@@ -88,7 +88,8 @@ def index_chunks(chunks: Iterable[ChunkPayload], *, embedder: DocumentEmbedder |
             )
             if was_created:
                 created += 1
-                pending.append((record, payload))
+                if embedder:
+                    pending.append((record, payload))
             elif record.content_hash != text_hash:
                 record.document = document
                 record.heading_path = payload.heading_path
@@ -103,6 +104,11 @@ def index_chunks(chunks: Iterable[ChunkPayload], *, embedder: DocumentEmbedder |
                 record.embedded_at = None
                 record.save()
                 updated += 1
+                if embedder:
+                    pending.append((record, payload))
+            elif embedder and (record.embedding is None or record.embedding_model != embedder.model_name):
+                # A prior --skip-embeddings run intentionally creates the row
+                # without a vector. The next normal run must fill that gap.
                 pending.append((record, payload))
             else:
                 skipped += 1

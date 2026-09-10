@@ -70,6 +70,15 @@ class KnowledgeIndexingTests(TestCase):
         self.assertEqual(result.skipped_embeddings, len(self.payloads))
         self.assertEqual(second.calls, 0)
 
+    def test_normal_run_embeds_rows_created_by_a_prior_skip_run(self):
+        index_chunks(self.payloads)
+        embedder = FakeEmbedder()
+
+        result = index_chunks(self.payloads, embedder=embedder)
+
+        self.assertEqual(result.embedded_chunks, len(self.payloads))
+        self.assertEqual(embedder.calls, 1)
+
     def test_changed_content_reembeds_only_the_changed_chunk(self):
         index_chunks(self.payloads, embedder=FakeEmbedder())
         changed = self.payloads[0].model_copy(update={"content": self.payloads[0].content + " 변경 안내"})
