@@ -1,0 +1,125 @@
+"""Korean-safe PostgreSQL full-text search and metadata filtering."""
+
+from __future__ import annotations
+
+import re
+import unicodedata
+from datetime import date
+from typing import Iterable
+
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.db.models import Q, Value
+from pydantic import BaseModel, ConfigDict
+
+from ..models import KnowledgeChunk
+
+
+TOKEN_RE = re.compile(r"[0-9a-z가-힣]{2,}", re.IGNORECASE)
+STOP_WORDS = {"알려줘", "알려주세요", "어떻게", "무엇", "대한", "관련", "있는", "해줘", "해주세요"}
+
+
+def keyword_terms(query: str) -> list[str]:
+    """Normalize Korean punctuation and retain meaningful exact terms only."""
+
+    normalized = unicodedata.normalize("NFKC", query).lower().replace("·", " ")
+    terms: list[str] = []
+    for term in TOKEN_RE.findall(normalized):
+        if term not in STOP_WORDS and term not in terms:
+            terms.append(term)
+    return terms
+
+
+def search_text_for(chunk: KnowledgeChunk) -> str:
+    document = chunk.document
+    return "\n".join(
+        [
+            document.title,
+            " ".join(chunk.heading_path),
+            " ".join(document.category),
+            str(document.effective_year or ""),
+            chunk.content,
+        ]
+    )
+
+
+def refresh_fts(chunks: Iterable[KnowledgeChunk]) -> int:
+    """Build PostgreSQL's simple-config FTS vectors for exact Korean tokens."""
+
+    count = 0
+    for chunk in chunks:
+        text = search_text_for(chunk)
+        KnowledgeChunk.objects.filter(pk=chunk.pk).update(
+            search_text=text,
+            search_vector=SearchVector(Value(text), config="simple"),
+        )
+        count += 1
+    return count
+
+
+class KeywordResult(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    chunk_id: str
+    score: float
+    source_id: str
+    document_title: str
+    effective_year: int | None
+    document_status: str
+    heading_path: list[str]
+    canonical_url: str
+    content: str
+
+
+class KeywordRetriever:
+    default_top_k = 5
+
+    def search(
+        self,
+        query: str,
+        *,
+        top_k: int = default_top_k,
+        effective_year: int | None = None,
+        document_status: str | None = None,
+        effective_on: date | None = None,
+        category: str | None = None,
+    ) -> list[KeywordResult]:
+        terms = keyword_terms(query)
+        if not terms:
+            raise ValueError("query must contain at least one meaningful keyword")
+        if not 1 <= top_k <= 20:
+            raise ValueError("top_k must be between 1 and 20")
+
+        ts_query = SearchQuery(terms[0], config="simple", search_type="plain")
+        for term in terms[1:]:
+            ts_query |= SearchQuery(term, config="simple", search_type="plain")
+        filters = Q(search_vector=ts_query)
+        if effective_year is not None:
+            filters &= Q(document__effective_year=effective_year)
+        if document_status is not None:
+            filters &= Q(document__document_status=document_status)
+        if category is not None:
+            filters &= Q(document__category__contains=[category])
+        if effective_on is not None:
+            filters &= (Q(document__effective_from__isnull=True) | Q(document__effective_from__lte=effective_on))
+            filters &= (Q(document__effective_to__isnull=True) | Q(document__effective_to__gte=effective_on))
+
+        records = (
+            KnowledgeChunk.objects.filter(filters)
+            .select_related("document")
+            .annotate(rank=SearchRank("search_vector", ts_query, cover_density=True))
+            .order_by("-rank", "chunk_id")[:top_k]
+        )
+        return [
+            KeywordResult(
+                chunk_id=record.chunk_id,
+                score=float(record.rank),
+                source_id=record.document.source_id,
+                document_title=record.document.title,
+                effective_year=record.document.effective_year,
+                document_status=record.document.document_status,
+                heading_path=record.heading_path,
+                canonical_url=record.document.canonical_url,
+                content=record.content,
+            )
+            for record in records
+        ]

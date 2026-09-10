@@ -52,6 +52,7 @@ def index_chunks(chunks: Iterable[ChunkPayload], *, embedder: DocumentEmbedder |
     created = updated = deleted = skipped = 0
     documents: dict[str, KnowledgeDocument] = {}
     active_chunk_ids: dict[str, set[str]] = {}
+    fts_pending: list[KnowledgeChunk] = []
 
     with transaction.atomic():
         for payload in payloads:
@@ -88,6 +89,7 @@ def index_chunks(chunks: Iterable[ChunkPayload], *, embedder: DocumentEmbedder |
             )
             if was_created:
                 created += 1
+                fts_pending.append(record)
                 if embedder:
                     pending.append((record, payload))
             elif record.content_hash != text_hash:
@@ -104,6 +106,7 @@ def index_chunks(chunks: Iterable[ChunkPayload], *, embedder: DocumentEmbedder |
                 record.embedded_at = None
                 record.save()
                 updated += 1
+                fts_pending.append(record)
                 if embedder:
                     pending.append((record, payload))
             elif embedder and (record.embedding is None or record.embedding_model != embedder.model_name):
@@ -130,6 +133,11 @@ def index_chunks(chunks: Iterable[ChunkPayload], *, embedder: DocumentEmbedder |
                     record.embedding_model = embedder.model_name
                     record.embedded_at = now()
                     record.save(update_fields=["embedding", "embedding_model", "embedded_at", "updated_at"])
+
+        if fts_pending:
+            from .fts import refresh_fts
+
+            refresh_fts(fts_pending)
 
     return IndexingResult(
         documents=len(documents),
