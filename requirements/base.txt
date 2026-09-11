@@ -7,4 +7,5 @@ beautifulsoup4>=4.12,<5
 pypdf>=5.0,<7
 PyMuPDF>=1.28,<2
 PyYAML>=6.0,<7
-google-genai>=1.0,<2
+google-genai>=2.19,<3
+google-adk>=2.9,<3

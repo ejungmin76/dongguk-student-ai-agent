@@ -58,3 +58,6 @@ python manage.py test --settings=config.settings.test
 
 Tool과 Agent가 공유하는 상태, 오류, 출처, Action, 결과 envelope 규격은
 [`docs/common-schemas.md`](docs/common-schemas.md)에 정의되어 있습니다.
+
+Google ADK + Gemini Agent의 초기 실행 방법과 현재 제한 사항은
+[`docs/adk-agent-bootstrap.md`](docs/adk-agent-bootstrap.md)에 정의되어 있습니다.
