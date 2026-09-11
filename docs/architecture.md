@@ -34,7 +34,7 @@ apps/
   core/                  health check와 공통 Django 기반
   academic/              학생, 성적, 수강 도메인(Phase 1에서 생성)
   knowledge/             문서와 검색 도메인(Phase 2에서 생성)
-  university_service/    검증된 메뉴와 Action 도메인(Phase 4에서 생성)
+  ndrims/                로그인된 nDRIMS 메뉴 지도 도메인(Phase 4에서 생성)
   conversation/          세션과 대화 문맥 도메인(Phase 4에서 생성)
 
 agent/
@@ -47,7 +47,7 @@ agent/
 tools/
   academic/              학사 Service를 Agent capability로 노출
   knowledge/             RAG Service를 Agent capability로 노출
-  university_service/    메뉴 Service를 Agent capability로 노출
+  ndrims/                nDRIMS 메뉴 검색 Service를 Agent capability로 노출
 
 config/                  Django 실행 및 환경별 설정
 docs/                    아키텍처와 주요 결정 기록

@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.academic.apps.AcademicConfig",
     "apps.knowledge.apps.KnowledgeConfig",
+    "apps.ndrims.apps.NdrimsConfig",
 ]
 
 MIDDLEWARE = [
