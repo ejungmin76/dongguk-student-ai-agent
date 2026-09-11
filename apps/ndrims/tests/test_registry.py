@@ -35,6 +35,7 @@ class NdrimsMenuRegistryTests(TestCase):
         call_command("seed_ndrims_menus")
 
         menu = NdrimsMenu.objects.get(menu_key="course-registration-history")
+        self.assertEqual(first_count, 150)
         self.assertEqual(NdrimsMenu.objects.count(), first_count)
         self.assertEqual(menu.breadcrumb, ["수강신청", "수강신청내역확인"])
         self.assertTrue(menu.is_active)

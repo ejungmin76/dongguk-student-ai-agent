@@ -1,192 +1,82 @@
-- menu_key: student-applications-other
-  title: 학생신청(기타)
-  parent_key: null
-  sort_order: 10
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: academic-status
-  title: 학적/확인서
-  parent_key: null
-  sort_order: 20
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: course-registration
-  title: 수강신청
-  parent_key: null
-  sort_order: 30
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: class-evaluation
-  title: 수업/강의평가
-  parent_key: null
-  sort_order: 40
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: grades
-  title: 성적
-  parent_key: null
-  sort_order: 50
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: scholarships
-  title: 장학
-  parent_key: null
-  sort_order: 60
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: tuition
-  title: 등록
-  parent_key: null
-  sort_order: 70
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: graduation
-  title: 졸업
-  parent_key: null
-  sort_order: 80
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: internship
-  title: 현장실습
-  parent_key: null
-  sort_order: 90
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: reserve-forces
-  title: 예비군
-  parent_key: null
-  sort_order: 100
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: summer-school
-  title: 써머스쿨
-  parent_key: null
-  sort_order: 110
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: namsan-dormitory
-  title: 남산학사
-  parent_key: null
-  sort_order: 120
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: chungmu-dormitory
-  title: 충무학사
-  parent_key: null
-  sort_order: 130
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: goyang-dormitory
-  title: 고양학사
-  parent_key: null
-  sort_order: 140
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: notices
-  title: 공지사항
-  parent_key: null
-  sort_order: 150
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: desired-course-application
-  title: 희망강의신청
-  parent_key: course-registration
-  sort_order: 10
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: course-registration-history
-  title: 수강신청내역확인
-  parent_key: course-registration
-  sort_order: 20
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: closed-course-replacement
-  title: 수강신청(폐강대체)
-  parent_key: course-registration
-  sort_order: 30
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: course-cancellation
-  title: 수강취소신청
-  parent_key: course-registration
-  sort_order: 40
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: special-liberal-arts-course-request
-  title: 교양과목특별수강희망신청(졸업대상자)
-  parent_key: course-registration
-  sort_order: 50
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: military-e-learning-course-registration
-  title: 군이러닝수강신청
-  parent_key: course-registration
-  sort_order: 60
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: exploratory-credit-application
-  title: 탐색학점제신청
-  parent_key: course-registration
-  sort_order: 70
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: ic-application
-  title: IC신청
-  parent_key: course-registration
-  sort_order: 80
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: seasonal-campus-exchange-registration
-  title: 계절학기캠퍼스교류수강신청
-  parent_key: course-registration
-  sort_order: 90
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: diy-major-exploration-registration
-  title: DIY전공탐색수강신청
-  parent_key: course-registration
-  sort_order: 100
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: student-record-view
-  title: 학적부열람
-  parent_key: academic-status
-  sort_order: 10
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: personal-information-update
-  title: 신상정보수정
-  parent_key: academic-status
-  sort_order: 20
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: transfer-result-announcement
-  title: 전과합격자발표
-  parent_key: academic-status
-  sort_order: 30
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: degree-certificate
-  title: 트랙제/Degree증명발급
-  parent_key: academic-status
-  sort_order: 40
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: volunteer-certificate-print
-  title: 봉사인증서출력(학생)
-  parent_key: academic-status
-  sort_order: 50
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: award-certificate-print
-  title: 수상확인서출력
-  parent_key: academic-status
-  sort_order: 60
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
-- menu_key: multiple-major-plan-survey
-  title: 다전공 이수 계획 여부 조사
-  parent_key: academic-status
-  sort_order: 70
-  source_url: https://ndrims.dongguk.edu/main/main.clx
-  verified_at: 2026-09-11
+source_url: https://ndrims.dongguk.edu/main/main.clx
+verified_at: 2026-09-11
+# Logged-in undergraduate nDRIMS menu tree. Titles are copied verbatim;
+# internal menu IDs remain empty until the extension can verify them.
+menus:
+  - {menu_key: privacy-consent, title: 개인정보수집동의}
+  - {menu_key: student-request-inbox, title: "【학생신청】신청함"}
+  - {menu_key: student-request-in-progress, title: "【학생신청】진행함"}
+  - {menu_key: student-request-completed, title: "【학생신청】완료함"}
+  - menu_key: student-applications-other
+    title: 학생신청(기타)
+    children:
+      - [volunteer-reflection-registration, 봉사소감문등록]
+      - [religious-activity-application, 신행활동신청]
+      - [religious-activity-mileage, 신행활동마일리지점수확인]
+      - [religious-activity-guide, 학생신행활동기준표안내]
+      - [teaching-course-application-cancellation, 교직이수신청/취소신청]
+      - [educational-volunteer-hours, 교육봉사활동시간등록]
+      - [gender-sensitivity-education-application, 성인지교육신청]
+      - [first-aid-cpr-practice-application, 응급처치및심폐소생술 실습신청]
+      - [teaching-aptitude-test-application, 교직인적성검사 신청]
+      - [teaching-other-service-application, 교직기타 서비스신청]
+      - [diy-survey, DIY설문조사]
+      - [exchange-status-registration, 교류상황및파견정보등록]
+      - [international-exchange-grade-registration, 국외교류인정성적등록]
+      - [overseas-study-tour-schedule, 해외학술탐방일정관리]
+      - [work-study-hours-registration, 근로장학근로시간등록]
+      - [buddhist-club-join, 불교동아리가입]
+      - [student-id-privacy-consent, 학생증개인정보동의]
+      - [deis-parent-service-consent, DEIS학부모서비스제공동의]
+      - [vote, 투표하기]
+  - menu_key: academic-status
+    title: 학적/확인서
+    children: [[student-record-view, 학적부열람], [personal-information-update, 신상정보수정], [transfer-result-announcement, 전과합격자발표], [degree-certificate, "트랙제/Degree증명발급"], [volunteer-certificate-print, "봉사인증서출력(학생)"], [award-certificate-print, 수상확인서출력], [multiple-major-plan-survey, 다전공 이수 계획 여부 조사]]
+  - menu_key: course-registration
+    title: 수강신청
+    children: [[desired-course-application, 희망강의신청], [course-registration-history, 수강신청내역확인], [closed-course-replacement, "수강신청(폐강대체)"], [course-cancellation, 수강취소신청], [special-liberal-arts-course-request, "교양과목특별수강희망신청(졸업대상자)"], [military-e-learning-course-registration, 군이러닝수강신청], [exploratory-credit-application, 탐색학점제신청], [ic-application, IC신청], [seasonal-campus-exchange-registration, 계절학기캠퍼스교류수강신청], [diy-major-exploration-registration, DIY전공탐색수강신청]]
+  - menu_key: class-evaluation
+    title: 수업/강의평가
+    children: [[lecture-evaluation-registration, 강의평가등록], [lecture-evaluation-results, 강의평가결과공개], [diy-lecture-evaluation-registration, DIY강의평가등록], [curriculum-view, 교육과정조회], [master-timetable-view, 종합강의시간표조회], [graduate-course-offering-view, "개설강좌조회(대학원)"], [linked-major-timetable-view, 연계전공시간표조회], [convergence-major-timetable-view, 융합전공시간표조회], [personal-timetable-view, 개인강의시간표조회], [carried-over-credit-view, 학생별이월학점조회], [room-timetable-view, 강의실별시간표조회], [makeup-class-view, 휴보강조회], [attendance-view-student, "출결확인(학생)"], [excused-absence-certificate-print, 유고결석인정서 출력], [employment-certificate-print, 취업사실확인서 출력]]
+  - menu_key: grades
+    title: 성적
+    children: [[grade-by-evaluation-item, 평가항목별성적조회], [grade-disclosure, 성적공시], [grade-by-completion-category, 이수구분별성적조회], [all-grades-view, 전체성적조회]]
+  - menu_key: scholarships
+    title: 장학
+    children: [[scholarship-benefit-certificate, 장학수혜확인원출력], [scholarship-non-benefit-certificate, 장학미수혜확인원출력], [buddhist-college-event-participation, 불교대학행사참여확인]]
+  - menu_key: tuition
+    title: 등록
+    children: [[tuition-payment-certificate, 등록금납부확인서출력], [education-expense-certificate, 교육비납입증명서출력], [tuition-bill-print, 등록금고지서출력], [graduation-album-refund, 졸업앨범학사모액자비환불]]
+  - menu_key: teaching
+    title: 교직
+    children: [[teaching-program-result, 교직이수예정자합격자발표], [teaching-aptitude-test, 교직인적성검사], [teaching-aptitude-test-result, 교직인적성결과조회], [school-practicum-certificate, 학교현장실습참가확인서], [education-volunteer-certificate, 교육봉사활동실습참가확인서], [first-aid-cpr-result, 응급처치및심폐소생술 실습결과조회], [first-aid-cpr-participation-certificate, 응급처치및심폐소생술 실습참가확인서], [first-aid-cpr-completion-certificate, 응급처치및심폐소생술 이수확인서], [gender-sensitivity-completion-view, 성인지교육이수현황조회], [teacher-qualification-certificate, 교사자격취득예정증명서], [teaching-audit-result, 교직사정결과조회]]
+  - menu_key: graduation
+    title: 졸업
+    children: [[graduation-simulation, 졸업시뮬레이션], [graduation-candidate-view, 졸업대상자확인], [graduation-decision-view, 졸업판정여부확인], [earned-credit-certificate-view, 취득학점확인서조회], [foreign-language-pass-exemption, 외국어PASS졸업요건제외신청]]
+  - menu_key: engineering-accreditation
+    title: 공학교육인증
+    children: [[advanced-program-graduation-certificate, 심화과정 졸업확인서출력], [advanced-program-expected-graduation-certificate, 심화과정 졸업예정확인서출력]]
+  - menu_key: internship
+    title: 현장실습
+    children: [[internship-preference-application, "[사전신청]희망직무및기업"], [resume-cover-letter-registration, "이력서,자기소개서 등록"], [internship-application, 현장실습지원], [internship-result-agreement, 현장실습지원결과및협약], [monthly-report-registration, 월간보고서등록], [interim-inspection-registration, 중간점검서등록], [final-report-registration, 종합보고서등록], [internship-survey, 현장실습설문조사], [internship-review-registration, "[실습수행]실습후기등록"], [internship-participation-certificate, 참가확인서발급처리]]
+  - menu_key: reserve-forces
+    title: 예비군
+    children: [[reserve-force-organization-view, 예비군편성확인], [reserve-force-training-view, 예비군훈련확인]]
+  - menu_key: education-center
+    title: 교육센터
+    children: [[foreign-language-course-registration, 외국어특강수강신청], [english-pass-mock-test-application, 영어PASS제모의시험신청], [english-pass-grade-view, 영어PASS제성적조회], [level-test-grade-view, 레벨테스트성적조회], [external-language-test-grade-registration, "외부어학시험성적등록신청(학생)"]]
+  - menu_key: summer-school
+    title: 써머스쿨
+    children: [[summer-school-course-registration, 수강신청], [summer-school-grade-method-change, 성적반영방법변경], [summer-school-course-history, 수강신청내역조회], [summer-school-grades, 성적조회]]
+  - menu_key: namsan-dormitory
+    title: 남산학사
+    children: [[namsan-application, 학사신청], [namsan-additional-application, 학사추가신청], [namsan-roommate-preference, 희망룸메이트등록], [namsan-overnight-application, 외박신청/취소신청], [namsan-moveout-application, 퇴사신청/취소신청], [namsan-cash-receipt-application, 현금영수증신청/취소신청], [namsan-inspection-absence-reason, 생활점검불참사유등록], [namsan-stay-application, 잔류신청/취소등록], [namsan-private-roommate-view, 사적정보/룸메이트조회], [namsan-dormitory-reward-penalty, 사생상벌조회]]
+  - menu_key: chungmu-dormitory
+    title: 충무학사
+    children: [[chungmu-application, 학사신청], [chungmu-additional-application, 학사추가신청], [chungmu-overnight-application, 외박신청/취소신청], [chungmu-moveout-application, 퇴사신청/취소신청], [chungmu-inspection-absence-reason, 생활점검불참사유등록], [chungmu-private-roommate-view, 사적정보/룸메이트조회], [chungmu-dormitory-reward-penalty, 사생상벌조회]]
+  - menu_key: goyang-dormitory
+    title: 고양학사
+    children: [[goyang-application, 학사신청], [goyang-roommate-preference, 희망룸메이트등록], [goyang-overnight-application, 외박신청/취소신청], [goyang-moveout-application, 퇴사신청/취소신청], [goyang-inspection-absence-reason, 생활점검불참사유등록], [goyang-stay-application, 잔류신청/취소신청], [goyang-roommate-view, 룸메이트정보조회], [goyang-private-information-view, 사적정보조회], [goyang-dormitory-reward-penalty, 사생상벌조회]]
+  - menu_key: notices
+    title: 공지사항
+    children: [[notice-view, 공지사항조회]]
