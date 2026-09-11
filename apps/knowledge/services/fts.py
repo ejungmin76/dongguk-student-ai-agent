@@ -12,7 +12,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q, Value
 from pydantic import BaseModel, ConfigDict
 
-from ..models import KnowledgeChunk, KnowledgeTermAlias
+from ..models import KnowledgeChunk
 
 
 # No Korean stop-word dictionary is used. It would make retrieval behavior
@@ -53,22 +53,6 @@ def search_label_for(chunk: KnowledgeChunk) -> str:
     """Short official labels are a safe target for typo tolerance."""
 
     return " ".join([chunk.document.title, *chunk.heading_path])
-
-
-def expand_terms(query: str) -> list[str]:
-    """Expand only aliases approved in the database with a source URL."""
-
-    terms = keyword_terms(query)
-    aliases = KnowledgeTermAlias.objects.filter(
-        approval_status=KnowledgeTermAlias.ApprovalStatus.APPROVED
-    ).filter(Q(alias__in=terms) | Q(canonical_term__in=terms))
-    for item in aliases:
-        for term in (item.canonical_term, item.alias):
-            normalized = keyword_terms(term)
-            for value in normalized:
-                if value not in terms:
-                    terms.append(value)
-    return terms
 
 
 def refresh_fts(chunks: Iterable[KnowledgeChunk]) -> int:
@@ -122,7 +106,7 @@ class KeywordRetriever:
         effective_on: date | None = None,
         category: str | None = None,
     ) -> list[KeywordResult]:
-        terms = expand_terms(query)
+        terms = keyword_terms(query)
         if not terms:
             raise ValueError("query must contain at least one meaningful keyword")
         if not 1 <= top_k <= 20:

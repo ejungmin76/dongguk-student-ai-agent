@@ -75,29 +75,3 @@ class KnowledgeChunk(models.Model):
 
     def __str__(self) -> str:
         return f"{self.document.source_id}: {' > '.join(self.heading_path)}"
-
-
-class KnowledgeTermAlias(models.Model):
-    """Governed terminology data, deliberately separate from retrieval code."""
-
-    class ApprovalStatus(models.TextChoices):
-        PROPOSED = "proposed", "검토중"
-        APPROVED = "approved", "승인"
-        RETIRED = "retired", "폐기"
-
-    canonical_term = models.CharField(max_length=200)
-    alias = models.CharField(max_length=200)
-    source_url = models.URLField(max_length=1000)
-    approval_status = models.CharField(max_length=20, choices=ApprovalStatus.choices, default=ApprovalStatus.PROPOSED)
-    effective_from = models.DateField(null=True, blank=True)
-    effective_to = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        constraints = [models.UniqueConstraint(fields=["canonical_term", "alias"], name="knowledge_unique_term_alias")]
-        verbose_name = "공식 용어 별칭"
-        verbose_name_plural = "공식 용어 별칭"
-
-    def __str__(self) -> str:
-        return f"{self.alias} → {self.canonical_term}"

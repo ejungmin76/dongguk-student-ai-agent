@@ -2,8 +2,8 @@ from datetime import date
 
 from django.test import TestCase
 
-from apps.knowledge.models import KnowledgeChunk, KnowledgeDocument, KnowledgeTermAlias
-from apps.knowledge.services.fts import FuzzyRetriever, KeywordRetriever, expand_terms, keyword_terms, refresh_fts
+from apps.knowledge.models import KnowledgeChunk, KnowledgeDocument
+from apps.knowledge.services.fts import FuzzyRetriever, KeywordRetriever, keyword_terms, refresh_fts
 
 
 class KeywordRetrieverTests(TestCase):
@@ -45,18 +45,6 @@ class KeywordRetrieverTests(TestCase):
         )
 
         self.assertEqual([item.chunk_id for item in results], ["current-retake"])
-
-    def test_only_approved_database_aliases_expand_a_query(self):
-        KnowledgeTermAlias.objects.create(
-            canonical_term="컴퓨터", alias="컴공", source_url="https://example.test/terms",
-            approval_status=KnowledgeTermAlias.ApprovalStatus.APPROVED,
-        )
-        KnowledgeTermAlias.objects.create(
-            canonical_term="재수강", alias="재수강신청", source_url="https://example.test/terms",
-        )
-
-        self.assertEqual(expand_terms("컴공"), ["컴공", "컴퓨터"])
-        self.assertEqual(expand_terms("재수강신청"), ["재수강신청"])
 
     def test_trigram_search_discovers_a_typo_from_official_section_labels(self):
         results = FuzzyRetriever().search("재수깡", top_k=3)
