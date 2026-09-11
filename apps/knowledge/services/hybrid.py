@@ -25,6 +25,8 @@ class HybridResult(BaseModel):
     canonical_url: str
     effective_year: int | None
     document_status: str
+    effective_from: date | None
+    effective_to: date | None
     heading_path: list[str]
     page_start: int | None = None
     page_end: int | None = None
@@ -127,6 +129,8 @@ class HybridRetriever:
                     canonical_url=source.canonical_url,
                     effective_year=source.effective_year,
                     document_status=source.document_status,
+                    effective_from=source.effective_from,
+                    effective_to=source.effective_to,
                     heading_path=source.heading_path,
                     page_start=getattr(source, "page_start", None),
                     page_end=getattr(source, "page_end", None),

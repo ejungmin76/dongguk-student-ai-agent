@@ -88,6 +88,8 @@ class KeywordResult(BaseModel):
     document_title: str
     effective_year: int | None
     document_status: str
+    effective_from: date | None
+    effective_to: date | None
     heading_path: list[str]
     canonical_url: str
     content: str
@@ -140,6 +142,8 @@ class KeywordRetriever:
                 document_title=record.document.title,
                 effective_year=record.document.effective_year,
                 document_status=record.document.document_status,
+                effective_from=record.document.effective_from,
+                effective_to=record.document.effective_to,
                 heading_path=record.heading_path,
                 canonical_url=record.document.canonical_url,
                 content=record.content,
@@ -171,6 +175,7 @@ class FuzzyRetriever:
                 chunk_id=record.chunk_id, score=float(record.similarity), source_id=record.document.source_id,
                 document_title=record.document.title, effective_year=record.document.effective_year,
                 document_status=record.document.document_status, heading_path=record.heading_path,
+                effective_from=record.document.effective_from, effective_to=record.document.effective_to,
                 canonical_url=record.document.canonical_url, content=record.content,
             )
             for record in records

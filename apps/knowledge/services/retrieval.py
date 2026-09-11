@@ -31,6 +31,8 @@ class RetrievedChunk(BaseModel):
     canonical_url: str
     effective_year: int | None
     document_status: str
+    effective_from: date | None
+    effective_to: date | None
     heading_path: list[str]
     page_start: int | None
     page_end: int | None
@@ -87,6 +89,8 @@ class DenseRetriever:
                 canonical_url=record.document.canonical_url,
                 effective_year=record.document.effective_year,
                 document_status=record.document.document_status,
+                effective_from=record.document.effective_from,
+                effective_to=record.document.effective_to,
                 heading_path=record.heading_path,
                 page_start=record.page_start,
                 page_end=record.page_end,
