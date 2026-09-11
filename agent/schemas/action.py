@@ -8,6 +8,7 @@ from .base import ContractModel
 
 class ActionType(StrEnum):
     OPEN_URL = "open_url"
+    NAVIGATE_NDRIMS_MENU = "navigate_ndrims_menu"
     REQUEST_CONFIRMATION = "request_confirmation"
 
 
@@ -24,6 +25,8 @@ class ActionReference(ContractModel):
     def validate_action_contract(self) -> Self:
         if self.action_type == ActionType.OPEN_URL and self.url is None:
             raise ValueError("open_url actions require a validated URL")
+        if self.action_type == ActionType.NAVIGATE_NDRIMS_MENU and self.url is not None:
+            raise ValueError("nDRIMS menu actions use a registered menu ID, not an LLM-generated URL")
         if self.action_type == ActionType.REQUEST_CONFIRMATION:
             object.__setattr__(self, "requires_confirmation", True)
         return self

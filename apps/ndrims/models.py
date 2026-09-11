@@ -5,6 +5,9 @@ from urllib.parse import urlparse
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q
+from pgvector.django import HnswIndex, VectorField
+
+from apps.knowledge.models import EMBEDDING_DIMENSIONS
 
 
 class NdrimsMenu(models.Model):
@@ -24,6 +27,10 @@ class NdrimsMenu(models.Model):
     source_url = models.URLField(max_length=1_000)
     verified_at = models.DateField()
     is_active = models.BooleanField(default=True)
+    embedding = VectorField(dimensions=EMBEDDING_DIMENSIONS, null=True, blank=True)
+    embedding_model = models.CharField(max_length=100, blank=True)
+    embedding_source_hash = models.CharField(max_length=64, blank=True)
+    embedded_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -33,6 +40,15 @@ class NdrimsMenu(models.Model):
             models.CheckConstraint(
                 condition=~Q(pk=F("parent")),
                 name="ndrims_menu_not_own_parent",
+            ),
+        ]
+        indexes = [
+            HnswIndex(
+                name="ndrims_menu_embedding_hnsw",
+                fields=["embedding"],
+                m=16,
+                ef_construction=64,
+                opclasses=["vector_cosine_ops"],
             ),
         ]
         verbose_name = "nDRIMS 메뉴"

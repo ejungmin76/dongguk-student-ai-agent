@@ -52,6 +52,18 @@ class GeminiDocumentEmbedder:
             self._types.Content(parts=[self._types.Part.from_text(text=self._retrieval_document_text(chunk))])
             for chunk in chunks
         ]
+        return self._embed_contents(contents, len(chunks))
+
+    def embed_texts(self, texts: Sequence[str]) -> list[list[float]]:
+        """Embed generic retrieval documents such as verified menu breadcrumbs."""
+
+        contents = [
+            self._types.Content(parts=[self._types.Part.from_text(text=text)])
+            for text in texts
+        ]
+        return self._embed_contents(contents, len(texts))
+
+    def _embed_contents(self, contents: list, expected_count: int) -> list[list[float]]:
         try:
             response = self._client.models.embed_content(
                 model=self.model_name,
@@ -61,7 +73,7 @@ class GeminiDocumentEmbedder:
             vectors = [list(item.values) for item in response.embeddings]
         except Exception as error:
             raise EmbeddingError(f"Gemini embedding request failed: {error}") from error
-        if len(vectors) != len(chunks) or any(len(vector) != self.dimensions for vector in vectors):
+        if len(vectors) != expected_count or any(len(vector) != self.dimensions for vector in vectors):
             raise EmbeddingError("Gemini returned an unexpected embedding count or dimension.")
         return vectors
 
