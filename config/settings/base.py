@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "apps.academic.apps.AcademicConfig",
     "apps.knowledge.apps.KnowledgeConfig",
     "apps.ndrims.apps.NdrimsConfig",
+    "apps.conversations.apps.ConversationsConfig",
 ]
 
 MIDDLEWARE = [

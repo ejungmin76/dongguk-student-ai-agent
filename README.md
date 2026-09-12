@@ -81,3 +81,6 @@ Gemini 초안의 사실·출처·Action을 서버에서 검증하는 방식은
 
 Tool 실패·부분 성공·재질문의 안전한 처리 정책은
 [`docs/fallback-policy.md`](docs/fallback-policy.md)에 정의되어 있습니다.
+
+대화 세션 보존 범위와 후속 질문 참조 검증 방식은
+[`docs/conversation-context.md`](docs/conversation-context.md)에 정의되어 있습니다.

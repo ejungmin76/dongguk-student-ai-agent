@@ -3,6 +3,13 @@
 from .action import ActionReference, ActionType
 from .error import ErrorDetail
 from .execution import ContextResolution, ExecutionPlan, ExecutionStep
+from .conversation import (
+    ConversationHistoryTurn,
+    ConversationTurnRole,
+    FollowUpCandidate,
+    FollowUpMode,
+    FollowUpResolution,
+)
 from .fallback import FailedStepSummary, FallbackDirective, FallbackMode
 from .meta import ResultMeta
 from .planning import (
@@ -32,6 +39,8 @@ __all__ = [
     "AgentResponse",
     "Capability",
     "ContextField",
+    "ConversationHistoryTurn",
+    "ConversationTurnRole",
     "ContextNeed",
     "ContextSource",
     "ContextResolution",
@@ -43,6 +52,9 @@ __all__ = [
     "ExecutionStep",
     "FallbackDirective",
     "FallbackMode",
+    "FollowUpCandidate",
+    "FollowUpMode",
+    "FollowUpResolution",
     "ResultMeta",
     "ResultStatus",
     "ResponseContext",
