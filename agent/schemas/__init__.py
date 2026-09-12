@@ -15,6 +15,7 @@ from .planning import (
 from .response import AgentResponse
 from .response_context import ContextItem, ContextOmission, ResponseContext
 from .response_draft import ResponseDraft
+from .validated_response import ValidatedResponse
 from .result import ToolResult
 from .source import SourceReference, SourceType
 from .status import ResultStatus
@@ -42,6 +43,7 @@ __all__ = [
     "ResultStatus",
     "ResponseContext",
     "ResponseDraft",
+    "ValidatedResponse",
     "PlanExecutionResult",
     "StepExecutionState",
     "ToolStepExecution",

@@ -75,3 +75,6 @@ Google ADK + Gemini Agent의 초기 실행 방법과 현재 제한 사항은
 
 안전한 Context를 짧고 친절한 한국어 답변 초안으로 바꾸는 방식은
 [`docs/response-agent.md`](docs/response-agent.md)에 정의되어 있습니다.
+
+Gemini 초안의 사실·출처·Action을 서버에서 검증하는 방식은
+[`docs/response-validator.md`](docs/response-validator.md)에 정의되어 있습니다.

@@ -43,7 +43,7 @@ response_agent = Agent(
 출처와 상태:
 - 공식 문서에 근거한 내용은 citation_options에 있는 source_id만 source_ids에 넣는다.
 - source_id와 action_id는 입력 목록에서 정확히 복사하며 새 값을 만들지 않는다.
-- status는 response_context.status보다 더 낙관적인 값으로 바꾸지 않는다.
+- status는 response_context.status와 정확히 같게 반환한다.
 - clarification일 때만 follow_up_question을 한 문장으로 작성한다. 그 외에는 null이다.
 
 후속 서버 Validator가 사실, 출처와 Action을 검증한다. 입력에 없는 사실을 그럴듯하게
@@ -148,4 +148,3 @@ class ResponseAgentRuntime:
         if final_draft is None:
             raise RuntimeError("response agent completed without a structured draft")
         return final_draft
-

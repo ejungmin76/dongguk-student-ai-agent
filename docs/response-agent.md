@@ -18,8 +18,8 @@ ResponseDraft
   answer + status + source_ids + action_ids + limitations
 ```
 
-Gemini는 `ResponseDraft`만 생성한다. 후속 Issue #29의 Response Validator가 source ID,
-Action ID, 상태와 사실 일치 여부를 검사한 뒤 UI가 사용할 최종 응답으로 확정한다.
+Gemini는 `ResponseDraft`만 생성한다. Response Validator가 source ID, Action ID, 상태와
+사실 일치 여부를 검사한 뒤 UI가 사용할 최종 응답으로 확정한다.
 
 ## 답변 스타일
 
@@ -40,9 +40,8 @@ Response Agent 입력에는 Context Builder가 정리한 `items`, 오류·누락
 `source_id`·제목·쪽수, Action의 `action_id`·label만 들어간다. 원본 Tool envelope,
 학번·표시 이름, 실행 ID, API 키, source URL, nDRIMS 세션 정보는 넣지 않는다.
 
-## 현재와 후속 검증
+## 서버 검증
 
-Issue #28은 Agent·Schema·글쓰기 instruction을 구현한다. 모델 출력에 있는 ID가 실제
-입력 allowlist에 존재하는지, 개인 사실이 Context를 벗어나지 않는지, partial 상태를
-success로 바꾸지 않는지는 Issue #29에서 서버 Validator로 강제한다.
-
+모델 출력의 ID가 실제 입력 allowlist에 존재하는지, 개인 숫자 사실이 Context를 벗어나지
+않는지, partial 상태를 success로 바꾸지 않는지는 Response Validator가 서버 코드로
+강제한다. 세부 규칙은 `docs/response-validator.md`에 정의되어 있다.
