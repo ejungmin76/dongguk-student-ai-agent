@@ -66,3 +66,6 @@ Google ADK + Gemini Agent의 초기 실행 방법과 현재 제한 사항은
 
 검증된 Capability를 요청별 ADK FunctionTool에 연결하는 방식은
 [`docs/adk-tool-registry.md`](docs/adk-tool-registry.md)에 정의되어 있습니다.
+
+여러 Tool의 의존 그래프, 병렬·순차 실행과 부분 실패 정책은
+[`docs/multi-tool-execution.md`](docs/multi-tool-execution.md)에 정의되어 있습니다.

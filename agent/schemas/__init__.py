@@ -16,6 +16,11 @@ from .response import AgentResponse
 from .result import ToolResult
 from .source import SourceReference, SourceType
 from .status import ResultStatus
+from .tool_execution import (
+    PlanExecutionResult,
+    StepExecutionState,
+    ToolStepExecution,
+)
 
 __all__ = [
     "ActionReference",
@@ -31,6 +36,9 @@ __all__ = [
     "ExecutionStep",
     "ResultMeta",
     "ResultStatus",
+    "PlanExecutionResult",
+    "StepExecutionState",
+    "ToolStepExecution",
     "IntentType",
     "QuestionAnalysis",
     "SourceReference",

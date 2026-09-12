@@ -49,9 +49,9 @@ ADK의 `FunctionTool`은 기존 Python 함수의 타입 힌트와 docstring으�
 사용자 또는 앞 단계 결과로 확인되지 않으면 생략하도록 instruction에 명시한다.
 
 ADK 실행 루프는 비동기이지만 기존 Django ORM Repository는 동기 API다. Registry의
-명시적 타입 어댑터가 `sync_to_async(thread_sensitive=True)`로 호출 경계를 변환한다.
-따라서 Django의 비동기 안전 검사를 끄지 않으면서 기존 트랜잭션과 DB 연결 규칙을
-유지한다.
+명시적 타입 어댑터가 각 호출을 별도 worker thread로 넘기며 호출 전후에 Django의
+오래된 DB 연결을 정리한다. 따라서 Django의 비동기 안전 검사를 끄지 않고 독립
+Tool을 실제로 병렬 실행할 수 있다.
 
 ## 현재 범위
 

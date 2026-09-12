@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from asgiref.sync import sync_to_async
+from django.db import close_old_connections
 from google.adk.tools import FunctionTool
 
 from agent.schemas import Capability, ExecutionPlan
@@ -46,6 +47,19 @@ class ToolDefinition:
     builder: Callable[[ToolBuildContext], Callable[..., Any]] | None
 
 
+async def _run_sync_tool(sync_tool: Callable[..., dict], **kwargs: Any) -> dict:
+    """Run one synchronous service call in an isolated worker DB context."""
+
+    def invoke() -> dict:
+        close_old_connections()
+        try:
+            return sync_tool(**kwargs)
+        finally:
+            close_old_connections()
+
+    return await sync_to_async(invoke, thread_sensitive=False)()
+
+
 def _student_profile(context: ToolBuildContext) -> Callable[..., Any]:
     sync_tool = build_get_student_profile_tool(
         context.actor,
@@ -56,7 +70,8 @@ def _student_profile(context: ToolBuildContext) -> Callable[..., Any]:
         target_student_number: str | None = None,
     ) -> dict:
         """Return the authenticated student's minimum academic profile."""
-        return await sync_to_async(sync_tool, thread_sensitive=True)(
+        return await _run_sync_tool(
+            sync_tool,
             target_student_number=target_student_number,
         )
 
@@ -76,7 +91,8 @@ def _academic_records(context: ToolBuildContext) -> Callable[..., Any]:
         category: str | None = None,
     ) -> dict:
         """Return grades and earned credits for the authenticated student."""
-        return await sync_to_async(sync_tool, thread_sensitive=True)(
+        return await _run_sync_tool(
+            sync_tool,
             target_student_number=target_student_number,
             year=year,
             semester=semester,
@@ -96,7 +112,8 @@ def _current_schedule(context: ToolBuildContext) -> Callable[..., Any]:
         target_student_number: str | None = None,
     ) -> dict:
         """Return the authenticated student's current courses and timetable."""
-        return await sync_to_async(sync_tool, thread_sensitive=True)(
+        return await _run_sync_tool(
+            sync_tool,
             target_student_number=target_student_number,
         )
 
@@ -113,7 +130,8 @@ def _university_knowledge(context: ToolBuildContext) -> Callable[..., Any]:
         top_k: int = 5,
     ) -> dict:
         """Search official university documents and return citable sources."""
-        return await sync_to_async(sync_tool, thread_sensitive=True)(
+        return await _run_sync_tool(
+            sync_tool,
             question=question,
             effective_year=effective_year,
             effective_on=effective_on,
@@ -128,7 +146,8 @@ def _ndrims_menu(context: ToolBuildContext) -> Callable[..., Any]:
 
     async def find_ndrims_menu(question: str, top_k: int = 5) -> dict:
         """Find verified nDRIMS menus and allowlisted navigation actions."""
-        return await sync_to_async(sync_tool, thread_sensitive=True)(
+        return await _run_sync_tool(
+            sync_tool,
             question=question,
             top_k=top_k,
         )
