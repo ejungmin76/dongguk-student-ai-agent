@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 type Detail = { label: string; url?: string };
 type Message = { role: "user" | "assistant"; text: string; details?: Detail[] };
 
-export default function ChatWidget({ autoOpen = false }: { autoOpen?: boolean }) {
+export default function ChatWidget({ autoOpen = false, extensionMode = false }: { autoOpen?: boolean; extensionMode?: boolean }) {
   const [open, setOpen] = useState(autoOpen); const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]); const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(""); const [error, setError] = useState("");
@@ -16,10 +16,17 @@ export default function ChatWidget({ autoOpen = false }: { autoOpen?: boolean })
     setText(""); setError(""); setBusy(true); setStatus("답변을 준비하고 있어요…");
     setMessages(current => [...current, {role:"user", text:question}, {role:"assistant", text:""}]);
     try {
-      const csrfResponse = await fetch("/api/csrf/", {cache:"no-store", credentials:"include"});
-      if (!csrfResponse.ok) throw new Error(await readableError(csrfResponse, "Django API에 연결할 수 없습니다."));
-      const csrf = await csrfResponse.json();
-      const response = await fetch("/api/chat/stream/", {method:"POST", credentials:"include", headers:{"Content-Type":"application/json", "X-CSRFToken":csrf.csrf_token}, body:JSON.stringify({message:question, session_id:sessionId})});
+      let headers: Record<string,string> = {"Content-Type":"application/json"};
+      if (extensionMode) {
+        const key = "dgu-extension-session";
+        const extensionSession = localStorage.getItem(key) ?? crypto.randomUUID();
+        localStorage.setItem(key, extensionSession); headers["X-DGU-Extension-Session"] = extensionSession;
+      } else {
+        const csrfResponse = await fetch("/api/csrf/", {cache:"no-store", credentials:"include"});
+        if (!csrfResponse.ok) throw new Error(await readableError(csrfResponse, "Django API에 연결할 수 없습니다."));
+        const csrf = await csrfResponse.json(); headers["X-CSRFToken"] = csrf.csrf_token;
+      }
+      const response = await fetch(extensionMode ? "/api/chat/stream/extension/" : "/api/chat/stream/", {method:"POST", credentials:"include", headers, body:JSON.stringify({message:question, session_id:sessionId})});
       if (!response.ok || !response.body) throw new Error(await readableError(response, "요청을 처리하지 못했습니다."));
       const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
       while (true) { const {value, done} = await reader.read(); if (done) break; buffer += decoder.decode(value, {stream:true}); const end = buffer.lastIndexOf("\n\n"); if (end < 0) continue; const blocks = buffer.slice(0,end).split("\n\n"); buffer = buffer.slice(end+2); blocks.forEach(block => handleEvent(block)); }

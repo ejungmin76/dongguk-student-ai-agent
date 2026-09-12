@@ -3,7 +3,7 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, StreamingHttpResponse
 from django.middleware.csrf import get_token
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from pydantic import ValidationError
 
@@ -88,6 +88,31 @@ def agent_chat_stream(request):
         return api_error(code="INVALID_REQUEST", message="message와 선택적 session_id 형식을 확인해 주세요.", status=400)
     except ObjectDoesNotExist:
         return api_error(code="SESSION_NOT_FOUND", message="대화 세션을 찾을 수 없습니다.", status=404)
+    response = StreamingHttpResponse(agent_chat_stream_service.generate(run_id=run.run_id, authenticated_subject=subject, message=payload.message), content_type="text/event-stream")
+    response["Cache-Control"] = "no-cache"
+    response["X-Accel-Buffering"] = "no"
+    return response
+
+
+@csrf_exempt
+@require_POST
+def agent_chat_stream_extension(request):
+    """Extension-only stream endpoint using a random extension session header."""
+    if request.content_type != "application/json":
+        return api_error(code="UNSUPPORTED_MEDIA_TYPE", message="application/json 요청만 허용됩니다.", status=415)
+    extension_id = request.headers.get("X-DGU-Extension-Session", "").strip()
+    if len(extension_id) < 16 or len(extension_id) > 128:
+        return api_error(code="INVALID_EXTENSION_SESSION", message="확장프로그램 세션을 확인해 주세요.", status=400)
+    try:
+        payload = ChatRequestSchema.model_validate_json(request.body)
+        subject = f"anonymous-extension:{extension_id}"
+        run = agent_chat_stream_service.start(authenticated_subject=subject, session_id=str(payload.session_id) if payload.session_id else None)
+    except ConversationAccessError:
+        return api_error(code="SESSION_FORBIDDEN", message="접근할 수 없는 대화 세션입니다.", status=403)
+    except ConversationExpiredError:
+        return api_error(code="SESSION_EXPIRED", message="대화 세션이 만료되었습니다. 새 대화를 시작해 주세요.", status=410)
+    except (ValidationError, ValueError, json.JSONDecodeError):
+        return api_error(code="INVALID_REQUEST", message="message와 선택적 session_id 형식을 확인해 주세요.", status=400)
     response = StreamingHttpResponse(agent_chat_stream_service.generate(run_id=run.run_id, authenticated_subject=subject, message=payload.message), content_type="text/event-stream")
     response["Cache-Control"] = "no-cache"
     response["X-Accel-Buffering"] = "no"
