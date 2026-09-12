@@ -69,3 +69,6 @@ Google ADK + Gemini Agent의 초기 실행 방법과 현재 제한 사항은
 
 여러 Tool의 의존 그래프, 병렬·순차 실행과 부분 실패 정책은
 [`docs/multi-tool-execution.md`](docs/multi-tool-execution.md)에 정의되어 있습니다.
+
+여러 Tool 결과를 답변용 최소 컨텍스트로 정규화하는 방식은
+[`docs/context-builder.md`](docs/context-builder.md)에 정의되어 있습니다.

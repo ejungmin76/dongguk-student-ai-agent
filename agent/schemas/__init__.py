@@ -13,6 +13,7 @@ from .planning import (
     QuestionAnalysis,
 )
 from .response import AgentResponse
+from .response_context import ContextItem, ContextOmission, ResponseContext
 from .result import ToolResult
 from .source import SourceReference, SourceType
 from .status import ResultStatus
@@ -31,11 +32,14 @@ __all__ = [
     "ContextNeed",
     "ContextSource",
     "ContextResolution",
+    "ContextItem",
+    "ContextOmission",
     "ErrorDetail",
     "ExecutionPlan",
     "ExecutionStep",
     "ResultMeta",
     "ResultStatus",
+    "ResponseContext",
     "PlanExecutionResult",
     "StepExecutionState",
     "ToolStepExecution",
