@@ -2,10 +2,6 @@
 
 동국대학교 학생 맞춤형 AI Agent PoC입니다.
 
-## 현재 범위
-
-이 단계는 Django 백엔드 골격, 개발·테스트 설정 분리, health check와 Django Admin 실행 확인까지 포함합니다. PostgreSQL/pgvector 연결은 다음 이슈에서 진행합니다.
-
 ## 요구 사항
 
 - Python 3.12 이상
