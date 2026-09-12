@@ -60,11 +60,10 @@ class NdrimsMenuSearchTool:
             actions=[
                 ActionReference(
                     action_id=item.menu_key,
-                    # The URL originates only from the verified nDRIMS registry;
-                    # the model never gets to construct a destination.
-                    action_type=ActionType.OPEN_URL,
+                    # The extension uses this registered key to click the menu
+                    # inside the already-authenticated nDRIMS SPA.
+                    action_type=ActionType.NAVIGATE_NDRIMS_MENU,
                     label=" > ".join(item.breadcrumb),
-                    url=item.source_url,
                 )
                 for item in results
             ],

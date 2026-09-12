@@ -254,11 +254,18 @@ class PublicAgentOrchestrator:
                     context=context,
                 )
             draft = await self.responder(question, context)
-            return self.fallback_policy.finalize(
+            result = self.fallback_policy.finalize(
                 directive=directive,
                 context=context,
                 draft=draft,
             )
+            if (
+                any(step.capability == Capability.NDRIMS_MENU for step in execution.steps)
+                and context.actions
+                and not result.actions
+            ):
+                result = result.model_copy(update={"actions": context.actions[:5]})
+            return result
         except Exception:
             # Browser clients receive a stable, non-technical response.  Detailed
             # errors remain in normal server logging/observability, never in chat.
