@@ -87,3 +87,6 @@ Tool 실패·부분 성공·재질문의 안전한 처리 정책은
 
 질의별 문맥 보강과 원문 추적 규칙은
 [`docs/query-rewrite.md`](docs/query-rewrite.md)에 정의되어 있습니다.
+
+웹 UI가 사용하는 인증·세션 기반 Chat API 계약은
+[`docs/agent-chat-api.md`](docs/agent-chat-api.md)에 정의되어 있습니다.
