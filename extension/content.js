@@ -15,7 +15,7 @@
   const button = document.createElement("button");
   button.className = "fab"; button.type = "button"; button.title = "동국대 AI Assistant"; button.textContent = "✦";
   const panel = document.createElement("iframe");
-  panel.className = "panel"; panel.title = "동국대 AI Assistant"; panel.src = "http://localhost:3000/embed";
+  panel.className = "panel"; panel.title = "동국대 AI Assistant"; panel.src = chrome.runtime.getURL("panel.html");
   button.addEventListener("click", () => panel.classList.toggle("open"));
   shadow.append(style, button, panel); document.documentElement.appendChild(host);
 })();

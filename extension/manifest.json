@@ -11,7 +11,7 @@
     "run_at": "document_idle"
   }],
   "web_accessible_resources": [{
-    "resources": ["icon.svg"],
+    "resources": ["panel.html"],
     "matches": ["https://ndrims.dongguk.edu/*"]
   }]
 }
