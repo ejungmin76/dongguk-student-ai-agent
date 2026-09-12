@@ -17,12 +17,9 @@
   const panel = document.createElement("iframe");
   panel.className = "panel"; panel.title = "동국대 AI Assistant"; panel.src = chrome.runtime.getURL("panel.html");
   button.addEventListener("click", () => panel.classList.toggle("open"));
-  window.addEventListener("message", (event) => {
-    const extensionOrigin = `chrome-extension://${chrome.runtime.id}`;
-    if (event.origin !== extensionOrigin || event.data?.type !== "DGU_NDRIMS_ACTION") return;
-    const label = String(event.data.label || "");
+  function openRegisteredMenu(label) {
     const title = label.split(" > ").filter(Boolean).pop();
-    if (!title) return;
+    if (!title) return false;
     const normalize = (value) => value.replace(/\s+/g, "").toLowerCase();
     const target = normalize(title);
     const candidates = [...document.querySelectorAll("button,a,[role=row],[role=treeitem],[role=button],li,[aria-label],[title]")]
@@ -30,9 +27,12 @@
       .filter((element) => [element.textContent, element.getAttribute("aria-label"), element.getAttribute("title")]
         .some((value) => normalize(value || "") === target));
     const clickable = candidates.find((element) => element.matches("[role=row],[role=treeitem],button,a,[role=button],li")) || candidates[0];
-    const opened = Boolean(clickable);
     if (clickable) { clickable.scrollIntoView({ block: "center" }); clickable.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })); }
-    panel.contentWindow?.postMessage({ type: "DGU_NDRIMS_ACTION_RESULT", opened, path: label }, extensionOrigin);
+    return Boolean(clickable);
+  }
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message?.type !== "DGU_NDRIMS_ACTION") return;
+    sendResponse({ opened: openRegisteredMenu(String(message.label || "")) });
   });
   shadow.append(style, button, panel); document.documentElement.appendChild(host);
 })();

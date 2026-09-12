@@ -3,7 +3,8 @@
   "name": "동국대 AI Assistant",
   "version": "0.1.0",
   "description": "nDRIMS 화면에서 동국대학교 학사 안내와 메뉴를 빠르게 찾습니다.",
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs"],
+  "background": { "service_worker": "background.js" },
   "host_permissions": ["https://ndrims.dongguk.edu/*", "http://localhost:3000/*"],
   "content_scripts": [{
     "matches": ["https://ndrims.dongguk.edu/*"],

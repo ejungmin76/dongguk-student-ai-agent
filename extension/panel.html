@@ -11,8 +11,10 @@
   <script>
     const assistantFrame = document.getElementById("assistant-frame");
     window.addEventListener("message", (event) => {
-      if (event.data?.type === "DGU_NDRIMS_ACTION") parent.postMessage(event.data, "*");
-      if (event.data?.type === "DGU_NDRIMS_ACTION_RESULT") assistantFrame.contentWindow.postMessage(event.data, "*");
+      if (event.data?.type !== "DGU_NDRIMS_ACTION") return;
+      chrome.runtime.sendMessage(event.data, (result) => {
+        assistantFrame.contentWindow.postMessage({ type: "DGU_NDRIMS_ACTION_RESULT", ...result }, "*");
+      });
     });
   </script>
 </body>
