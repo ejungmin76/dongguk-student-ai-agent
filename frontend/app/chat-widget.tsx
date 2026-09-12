@@ -31,7 +31,12 @@ export default function ChatWidget({ autoOpen = false }: { autoOpen?: boolean })
     if (item.event === "session") setSessionId(data.session_id);
     if (item.event === "progress") setStatus("답변을 준비하고 있어요…");
     if (item.event === "answer") setMessages(current => current.map((message,index) => index===current.length-1 ? {...message,text:data.text} : message));
-    if (item.event === "source" || item.event === "action") setMessages(current => current.map((message,index) => index===current.length-1 ? {...message,details:[...(message.details ?? []), {label:`${item.event === "source" ? "출처" : "서비스"}: ${data.title ?? data.label}`, url:item.event === "action" ? data.url : undefined}]} : message));
+    if (item.event === "source" || item.event === "action") {
+      if (item.event === "action" && data.action_type === "navigate_ndrims_menu" && typeof window !== "undefined") {
+        window.parent.postMessage({ type: "DGU_NDRIMS_ACTION", action_id: data.action_id, label: data.label }, "*");
+      }
+      setMessages(current => current.map((message,index) => index===current.length-1 ? {...message,details:[...(message.details ?? []), {label:`${item.event === "source" ? "출처" : "서비스"}: ${data.title ?? data.label}`, url:item.event === "action" ? data.url : undefined}]} : message));
+    }
     if (item.event === "complete" && data.limitations?.length) setMessages(current => current.map((message,index) => index===current.length-1 ? {...message,details:[...(message.details ?? []), ...data.limitations.map((label:string) => ({label}))]} : message));
     if (item.event === "error") setError(data.message ?? "답변을 준비하지 못했습니다.");
   }
