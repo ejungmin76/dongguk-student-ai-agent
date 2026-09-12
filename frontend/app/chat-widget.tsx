@@ -12,7 +12,7 @@ export default function ChatWidget({ autoOpen = false, extensionMode = false }: 
   const [sessionId, setSessionId] = useState<string | null>(null);
   useEffect(() => {
     const receive = (event: MessageEvent) => {
-      if (event.data?.type === "DGU_NDRIMS_ACTION_RESULT") setMenuStatus(event.data.opened ? "nDRIMS 메뉴를 열었습니다." : "현재 화면에서 메뉴를 찾지 못했습니다.");
+      if (event.data?.type === "DGU_NDRIMS_ACTION_RESULT") setMenuStatus(event.data.reason || (event.data.opened ? "nDRIMS 메뉴를 열었습니다." : "현재 화면에서 메뉴를 찾지 못했습니다."));
     };
     window.addEventListener("message", receive); return () => window.removeEventListener("message", receive);
   }, []);

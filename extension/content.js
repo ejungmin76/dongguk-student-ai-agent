@@ -17,22 +17,40 @@
   const panel = document.createElement("iframe");
   panel.className = "panel"; panel.title = "동국대 AI Assistant"; panel.src = chrome.runtime.getURL("panel.html");
   button.addEventListener("click", () => panel.classList.toggle("open"));
-  function openRegisteredMenu(label) {
-    const title = label.split(" > ").filter(Boolean).pop();
-    if (!title) return false;
-    const normalize = (value) => value.replace(/\s+/g, "").toLowerCase();
+  chrome.runtime.sendMessage({ type: "DGU_NDRIMS_REGISTER_TAB" });
+  const normalize = (value) => value.replace(/\s+/g, "").toLowerCase();
+  const findMenuRow = (title) => {
     const target = normalize(title);
-    const candidates = [...document.querySelectorAll("button,a,[role=row],[role=treeitem],[role=button],li,[aria-label],[title]")]
-      .filter((element) => element instanceof HTMLElement && element.offsetParent && element !== host)
-      .filter((element) => [element.textContent, element.getAttribute("aria-label"), element.getAttribute("title")]
-        .some((value) => normalize(value || "") === target));
-    const clickable = candidates.find((element) => element.matches("[role=row],[role=treeitem],button,a,[role=button],li")) || candidates[0];
-    if (clickable) { clickable.scrollIntoView({ block: "center" }); clickable.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })); }
-    return Boolean(clickable);
+    return [...document.querySelectorAll('[role="row"],[role="treeitem"]')]
+      .find((element) => element instanceof HTMLElement && element.offsetParent
+        && normalize(element.getAttribute("aria-label") || element.textContent || "") === target);
+  };
+  const activateMenuRow = (row) => {
+    row.scrollIntoView({ block: "center" });
+    row.focus?.();
+    row.click();
+  };
+  async function openRegisteredMenu(label) {
+    const path = label.split(">").map((part) => part.trim()).filter(Boolean);
+    const title = path.at(-1);
+    if (!title) return { opened: false, reason: "메뉴 경로가 비어 있습니다." };
+    let row = findMenuRow(title);
+    if (!row && path.length > 1) {
+      const parent = findMenuRow(path[path.length - 2]);
+      if (parent) {
+        activateMenuRow(parent);
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        row = findMenuRow(title);
+      }
+    }
+    if (!row) return { opened: false, reason: `nDRIMS에서 '${title}' 메뉴를 찾지 못했습니다.` };
+    activateMenuRow(row);
+    return { opened: true, reason: `'${title}' 메뉴를 열었습니다.` };
   }
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type !== "DGU_NDRIMS_ACTION") return;
-    sendResponse({ opened: openRegisteredMenu(String(message.label || "")) });
+    openRegisteredMenu(String(message.label || "")).then(sendResponse);
+    return true;
   });
   shadow.append(style, button, panel); document.documentElement.appendChild(host);
 })();
