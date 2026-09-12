@@ -60,3 +60,6 @@ Google ADK + Gemini Agent의 초기 실행 방법과 현재 제한 사항은
 
 자연어 질문을 상위 의도, 필요한 문맥, 허용 기능으로 변환하는 계약은
 [`docs/question-analysis.md`](docs/question-analysis.md)에 정의되어 있습니다.
+
+질문 문맥을 확인하고 검증 가능한 실행계획 IR로 변환하는 방식은
+[`docs/context-resolver-planner.md`](docs/context-resolver-planner.md)에 정의되어 있습니다.

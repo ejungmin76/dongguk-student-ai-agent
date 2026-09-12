@@ -37,6 +37,7 @@ class ContextField(StrEnum):
     ADMISSION_YEAR = "admission_year"
     CURRENT_TERM = "current_term"
     TARGET_TERM = "target_term"
+    TARGET_SERVICE = "target_service"
 
 
 class ContextSource(StrEnum):

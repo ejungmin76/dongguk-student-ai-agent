@@ -2,6 +2,7 @@
 
 from .action import ActionReference, ActionType
 from .error import ErrorDetail
+from .execution import ContextResolution, ExecutionPlan, ExecutionStep
 from .meta import ResultMeta
 from .planning import (
     Capability,
@@ -24,7 +25,10 @@ __all__ = [
     "ContextField",
     "ContextNeed",
     "ContextSource",
+    "ContextResolution",
     "ErrorDetail",
+    "ExecutionPlan",
+    "ExecutionStep",
     "ResultMeta",
     "ResultStatus",
     "IntentType",
