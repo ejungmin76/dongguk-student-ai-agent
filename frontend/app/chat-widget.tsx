@@ -16,7 +16,9 @@ export default function ChatWidget() {
     setText(""); setError(""); setBusy(true); setStatus("답변을 준비하고 있어요…");
     setMessages(current => [...current, {role:"user", text:question}, {role:"assistant", text:""}]);
     try {
-      const csrf = await fetch("/api/csrf/").then(res => res.json());
+      const csrfResponse = await fetch("/api/csrf/", {cache:"no-store"});
+      if (!csrfResponse.ok) throw new Error((await csrfResponse.json()).error?.message ?? "Django API에 연결할 수 없습니다.");
+      const csrf = await csrfResponse.json();
       const response = await fetch("/api/chat/stream/", {method:"POST", headers:{"Content-Type":"application/json", "X-CSRFToken":csrf.csrf_token}, body:JSON.stringify({message:question, session_id:sessionId})});
       if (!response.ok || !response.body) throw new Error((await response.json()).error?.message ?? "요청을 처리하지 못했습니다.");
       const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
