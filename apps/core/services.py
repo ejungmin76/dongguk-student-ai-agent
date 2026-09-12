@@ -18,15 +18,19 @@ class AgentChatService:
         self.runtime = runtime or StudentAgentRuntime()
 
     def chat(self, *, authenticated_subject: str, message: str, session_id: str | None = None) -> ChatResponseSchema:
+        prior_history = []
         if session_id is None:
             session = self.conversation_store.create_session(authenticated_subject=authenticated_subject)
         else:
             # Read first to enforce subject ownership and expiry before writing.
-            self.conversation_store.history(session_id=session_id, authenticated_subject=authenticated_subject)
+            prior_history = self.conversation_store.history(session_id=session_id, authenticated_subject=authenticated_subject)
             session = ConversationSession.objects.get(session_id=session_id)
 
         self.conversation_store.append_turn(session_id=str(session.session_id), authenticated_subject=authenticated_subject, role=ConversationTurn.Role.USER, message=message)
-        result = async_to_sync(self.runtime.run_turn)(user_id=authenticated_subject, session_id=str(session.session_id), message=message)
+        runtime_kwargs = {"user_id": authenticated_subject, "session_id": str(session.session_id), "message": message}
+        if isinstance(self.runtime, StudentAgentRuntime):
+            runtime_kwargs["history"] = prior_history
+        result = async_to_sync(self.runtime.run_turn)(**runtime_kwargs)
         if not isinstance(result, (AgentResponse, ValidatedResponse)):
             raise TypeError("agent runtime returned an unsupported response contract")
 

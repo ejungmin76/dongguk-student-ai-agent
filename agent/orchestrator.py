@@ -22,6 +22,8 @@ from agent.planners.execution_planner import (
     execution_planner_agent,
 )
 from agent.planners.question_analyzer import question_analyzer_agent
+from agent.planners.follow_up_resolver import build_follow_up_resolver_input, follow_up_resolver_agent
+from agent.conversation import FollowUpResolverPolicy
 from agent.public_mode import PUBLIC_CAPABILITIES, assert_public_plan
 from agent.responders import ResponseAgentRuntime
 from agent.schemas import (
@@ -37,6 +39,9 @@ from agent.schemas import (
     ContextNeed,
     ExecutionStep,
     ValidatedResponse,
+    ConversationHistoryTurn,
+    FollowUpResolution,
+    FollowUpMode,
 )
 from agent.tool_registry import ToolBuildContext
 
@@ -45,6 +50,7 @@ Model = TypeVar("Model", bound=BaseModel)
 Analyzer = Callable[[str], Awaitable[QuestionAnalysis]]
 Planner = Callable[[str, QuestionAnalysis], Awaitable[ExecutionPlan]]
 Responder = Callable[[str, ResponseContext], Awaitable[ResponseDraft]]
+FollowUpResolver = Callable[[str, list], Awaitable[FollowUpResolution]]
 
 NDRIMS_MAIN_URL = "https://ndrims.dongguk.edu/main/main.clx"
 logger = logging.getLogger(__name__)
@@ -102,6 +108,7 @@ class PublicAgentOrchestrator:
         analyzer: Analyzer | None = None,
         planner: Planner | None = None,
         responder: Responder | None = None,
+        follow_up_resolver: FollowUpResolver | None = None,
         executor: MultiToolExecutor | None = None,
         context_builder: ContextBuilder | None = None,
         fallback_policy: FallbackPolicy | None = None,
@@ -116,6 +123,11 @@ class PublicAgentOrchestrator:
             app_name="dongguk_public_execution_planning",
             agent=execution_planner_agent,
             schema=ExecutionPlan,
+        )
+        follow_up_runtime = StructuredAgentRunner(
+            app_name="dongguk_public_follow_up",
+            agent=follow_up_resolver_agent,
+            schema=FollowUpResolution,
         )
         response_runtime = ResponseAgentRuntime()
 
@@ -135,18 +147,47 @@ class PublicAgentOrchestrator:
                 context=context,
             )
         )
+        self.follow_up_resolver = follow_up_resolver or (
+            lambda question, candidates: follow_up_runtime.run(
+                build_follow_up_resolver_input(
+                    current_question=question,
+                    candidates=candidates,
+                )
+            )
+        )
         self.executor = executor or MultiToolExecutor()
         self.context_builder = context_builder or ContextBuilder()
         self.fallback_policy = fallback_policy or FallbackPolicy()
         self.tool_context = tool_context or ToolBuildContext()
 
-    async def run(self, *, question: str) -> ValidatedResponse:
+    async def run(
+        self,
+        *,
+        question: str,
+        history: list[ConversationHistoryTurn] | None = None,
+    ) -> ValidatedResponse:
         question = question.strip()
         if not question:
             return self._unavailable()
 
         try:
-            analysis = await self.analyzer(question)
+            effective_question = question
+            if history:
+                candidates = FollowUpResolverPolicy.candidates(history)
+                if candidates:
+                    resolution = await self.follow_up_resolver(question, candidates)
+                    if resolution.mode == FollowUpMode.CLARIFICATION:
+                        return ValidatedResponse(
+                            status=ResultStatus.CLARIFICATION,
+                            answer="어떤 이전 안내를 이어서 확인할지 한 가지만 알려주세요.",
+                            follow_up_question="이전 질문의 주제를 조금 더 구체적으로 말씀해 주세요.",
+                        )
+                    if resolution.mode == FollowUpMode.RESOLVED:
+                        referenced = resolution.referenced_turn_sequences[0]
+                        candidate = next(item for item in candidates if item.turn_sequence == referenced)
+                        effective_question = f"{candidate.user_message}\n후속 질문: {question}"
+
+            analysis = await self.analyzer(effective_question)
             private_capabilities = set(analysis.capabilities) - PUBLIC_CAPABILITIES
             # A model may over-select an academic capability for a generic policy
             # question. The intent is the stronger semantic signal: only an
@@ -189,7 +230,7 @@ class PublicAgentOrchestrator:
                 }
             )
             context_resolution = resolve_question_context(executable_analysis)
-            plan = await self.planner(question, executable_analysis)
+            plan = await self.planner(effective_question, executable_analysis)
             if plan.needs_clarification:
                 plan = self._public_fallback_plan(executable)
             assert_public_plan(plan)
@@ -200,7 +241,7 @@ class PublicAgentOrchestrator:
                 tool_context=self.tool_context,
                 # Anonymous public mode intentionally has no private context to
                 # inject; rewrite is therefore identity-preserving here.
-                question=question,
+                question=effective_question,
             )
             context = self.context_builder.build(execution)
             directive = self.fallback_policy.decide(

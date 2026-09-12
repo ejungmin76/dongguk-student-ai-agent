@@ -1,7 +1,7 @@
 """Programmatic runtime for the public evidence-first Agent."""
 
 from .orchestrator import PublicAgentOrchestrator
-from .schemas import ValidatedResponse
+from .schemas import ConversationHistoryTurn, ValidatedResponse
 
 
 APP_NAME = "dongguk_student_ai"
@@ -19,8 +19,9 @@ class StudentAgentRuntime:
         user_id: str,
         session_id: str,
         message: str,
+        history: list[ConversationHistoryTurn] | None = None,
     ) -> ValidatedResponse:
         # Ownership/history is managed by DjangoConversationStore.  These opaque
         # identifiers are accepted for the stable runtime interface only.
         del user_id, session_id
-        return await self.orchestrator.run(question=message)
+        return await self.orchestrator.run(question=message, history=history)
