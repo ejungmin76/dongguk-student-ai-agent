@@ -234,6 +234,7 @@ class PublicAgentOrchestrator:
             if plan.needs_clarification:
                 plan = self._public_fallback_plan(executable)
             assert_public_plan(plan)
+            execution_question = executable_analysis.search_query or effective_question
             execution = await self.executor.execute(
                 plan=plan,
                 analysis=executable_analysis,
@@ -241,7 +242,7 @@ class PublicAgentOrchestrator:
                 tool_context=self.tool_context,
                 # Anonymous public mode intentionally has no private context to
                 # inject; rewrite is therefore identity-preserving here.
-                question=effective_question,
+                question=execution_question,
             )
             context = self.context_builder.build(execution)
             directive = self.fallback_policy.decide(

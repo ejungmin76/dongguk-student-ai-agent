@@ -62,6 +62,7 @@ class QuestionAnalysis(GeminiContractModel):
     context_needs: list[ContextNeed] = Field(default_factory=list)
     needs_clarification: bool = False
     clarification_question: str | None = None
+    search_query: str | None = Field(default=None, max_length=300)
     rationale: str = Field(min_length=1, max_length=300)
 
     @model_validator(mode="after")

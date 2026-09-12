@@ -45,7 +45,11 @@ class HybridSearchResponse(BaseModel):
 
 
 class HybridRetriever:
-    """Fuse dense and exact-keyword ranks without comparing incompatible scores."""
+    """Fuse dense and exact-keyword ranks without comparing incompatible scores.
+
+    The final selection keeps both dense and keyword signals represented so a
+    typo/abbreviation hit cannot hide exact official wording (or vice versa).
+    """
 
     default_top_k = 5
     candidate_top_k = 10
@@ -94,11 +98,39 @@ class HybridRetriever:
         fused = self._fuse(dense_results, keyword_results)
         fusion_duration_ms = round((perf_counter() - fusion_started) * 1000)
         return HybridSearchResponse(
-            results=fused[:top_k],
+            results=self._balanced_top_k(fused, top_k),
             dense_duration_ms=dense_duration_ms,
             keyword_duration_ms=keyword_duration_ms,
             fusion_duration_ms=fusion_duration_ms,
         )
+
+    @staticmethod
+    def _balanced_top_k(results: list[HybridResult], top_k: int) -> list[HybridResult]:
+        """Keep both retrieval signals represented before filling by RRF rank.
+
+        A keyword-heavy query must not hide the strongest semantic hit, and a
+        typo/abbreviation query must not hide exact official wording. The
+        selection is entirely rank-based and does not contain domain terms.
+        """
+        if len(results) <= top_k:
+            return results
+        selected: list[HybridResult] = []
+        selected_ids: set[str] = set()
+        for predicate in (
+            lambda item: item.dense_rank == 1,
+            lambda item: item.keyword_rank == 1,
+        ):
+            match = next((item for item in results if predicate(item)), None)
+            if match is not None and match.chunk_id not in selected_ids:
+                selected.append(match)
+                selected_ids.add(match.chunk_id)
+        for item in results:
+            if len(selected) >= top_k:
+                break
+            if item.chunk_id not in selected_ids:
+                selected.append(item)
+                selected_ids.add(item.chunk_id)
+        return sorted(selected, key=lambda item: (-item.rrf_score, item.chunk_id))
 
     def _fuse(self, dense_results: list[RetrievedChunk], keyword_results: list[KeywordResult]) -> list[HybridResult]:
         candidates: dict[str, dict[str, object]] = {}

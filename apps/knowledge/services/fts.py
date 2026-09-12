@@ -62,13 +62,13 @@ def refresh_fts(chunks: Iterable[KnowledgeChunk]) -> int:
     for chunk in chunks:
         text = search_text_for(chunk)
         document = chunk.document
-        # A keyword in the official title or section label is stronger evidence
-        # than the same word appearing incidentally in a long guide table.
+        # The passage itself is the strongest evidence.  Titles and headings
+        # still contribute, but must not outrank a chunk that states the rule.
         vector = (
-            SearchVector(Value(document.title), config="simple", weight="A")
-            + SearchVector(Value(" ".join(chunk.heading_path)), config="simple", weight="A")
-            + SearchVector(Value(" ".join(document.category)), config="simple", weight="B")
-            + SearchVector(Value(chunk.content), config="simple", weight="D")
+            SearchVector(Value(chunk.content), config="simple", weight="A")
+            + SearchVector(Value(document.title), config="simple", weight="B")
+            + SearchVector(Value(" ".join(chunk.heading_path)), config="simple", weight="B")
+            + SearchVector(Value(" ".join(document.category)), config="simple", weight="D")
         )
         KnowledgeChunk.objects.filter(pk=chunk.pk).update(
             search_label=search_label_for(chunk),
