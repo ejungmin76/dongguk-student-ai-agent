@@ -59,6 +59,11 @@ class AgentChatApiTests(TestCase):
     def post(self, payload, *, content_type="application/json"):
         return self.client.post("/api/chat/", data=json.dumps(payload), content_type=content_type)
 
+    def test_csrf_endpoint_issues_a_token_for_the_nextjs_proxy(self):
+        response = self.client.get("/api/csrf/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["csrf_token"])
+
     def test_new_and_follow_up_requests_return_stable_json_and_session_id(self):
         first = self.post({"message": "최대 학점이 몇 학점이야?"})
         self.assertEqual(first.status_code, 200)

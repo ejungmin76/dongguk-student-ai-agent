@@ -1,0 +1,36 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+
+type Message = { role: "user" | "assistant"; text: string; details?: string[] };
+
+export default function ChatWidget() {
+  const [open, setOpen] = useState(false); const [text, setText] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]); const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState(""); const [error, setError] = useState("");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
+  async function submit(event?: FormEvent, suggested?: string) {
+    event?.preventDefault(); const question = (suggested ?? text).trim(); if (!question || busy) return;
+    setText(""); setError(""); setBusy(true); setStatus("답변을 준비하고 있어요…");
+    setMessages(current => [...current, {role:"user", text:question}, {role:"assistant", text:""}]);
+    try {
+      const csrf = await fetch("/api/csrf/").then(res => res.json());
+      const response = await fetch("/api/chat/stream/", {method:"POST", headers:{"Content-Type":"application/json", "X-CSRFToken":csrf.csrf_token}, body:JSON.stringify({message:question, session_id:sessionId})});
+      if (!response.ok || !response.body) throw new Error((await response.json()).error?.message ?? "요청을 처리하지 못했습니다.");
+      const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
+      while (true) { const {value, done} = await reader.read(); if (done) break; buffer += decoder.decode(value, {stream:true}); const end = buffer.lastIndexOf("\n\n"); if (end < 0) continue; const blocks = buffer.slice(0,end).split("\n\n"); buffer = buffer.slice(end+2); blocks.forEach(block => handleEvent(block)); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "연결이 끊겼습니다."); }
+    finally { setBusy(false); setStatus(""); }
+  }
+  function handleEvent(block: string) {
+    const item: Record<string,string> = {}; block.split("\n").forEach(line => { const index=line.indexOf(":"); if(index>0) item[line.slice(0,index)] = line.slice(index+1).trim(); }); const data = item.data ? JSON.parse(item.data) : {};
+    if (item.event === "session") setSessionId(data.session_id);
+    if (item.event === "progress") setStatus("답변을 준비하고 있어요…");
+    if (item.event === "answer") setMessages(current => current.map((message,index) => index===current.length-1 ? {...message,text:data.text} : message));
+    if (item.event === "source" || item.event === "action") setMessages(current => current.map((message,index) => index===current.length-1 ? {...message,details:[...(message.details ?? []), `${item.event === "source" ? "출처" : "서비스"}: ${data.title ?? data.label}`]} : message));
+    if (item.event === "complete" && data.limitations?.length) setMessages(current => current.map((message,index) => index===current.length-1 ? {...message,details:[...(message.details ?? []), ...data.limitations]} : message));
+    if (item.event === "error") setError(data.message ?? "답변을 준비하지 못했습니다.");
+  }
+  return <><button className="chat-fab" onClick={() => setOpen(true)} aria-label="AI Assistant 열기">✦</button>{open && <div className="widget"><header><div className="agent-mark">D</div><div><strong>동국대 AI Assistant</strong><small>공식 정보 기반 안내</small></div><button onClick={() => setOpen(false)} aria-label="닫기">×</button></header><div className="conversation">{messages.length===0 && <div className="welcome"><h2>무엇을 도와드릴까요?</h2><p>학사 안내와 nDRIMS 메뉴를 빠르게 찾아드릴게요.</p><button onClick={() => submit(undefined,"최대 수강학점이 몇 학점이야?")}>최대 수강학점</button><button onClick={() => submit(undefined,"기숙사 신청 메뉴를 찾아줘")}>기숙사 신청</button></div>}{messages.map((message,index) => <article className={`message ${message.role}`} key={index}><p>{message.text || (busy ? "답변을 작성하고 있어요…" : "")}</p>{message.details?.map((detail,i)=><small key={i}>{detail}</small>)}</article>)}</div>{status && <div className="stream-status">● {status}</div>}{error && <div className="widget-error">{error}<button onClick={() => submit(undefined, messages.filter(m=>m.role==="user").at(-1)?.text)}>다시 시도</button></div>}<form onSubmit={submit}><textarea value={text} onChange={e=>setText(e.target.value)} placeholder="질문을 입력하세요" maxLength={2000} rows={1}/><button disabled={!text.trim() || busy} aria-label="보내기">↑</button></form><footer>AI 답변은 공식 출처를 확인해 주세요.</footer></div>}</>;
+}

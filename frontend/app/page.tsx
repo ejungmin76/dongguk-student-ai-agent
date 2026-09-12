@@ -1,0 +1,5 @@
+import ChatWidget from "./chat-widget";
+
+export default function Home() {
+  return <main><nav><b>DONGGUK <i>AI</i></b><div className="nav-links"><span>How it works</span><span>서비스</span><span>학사 안내</span><span>nDRIMS</span></div><button className="nav-cta">학생 도우미 열기</button></nav><section className="hero"><div className="hero-copy"><p className="eyebrow">DONGGUK UNIVERSITY · STUDENT EXPERIENCE</p><h1>학교생활을<br/><em>더 빠르게</em> 이해하다.</h1><p className="description">공식 학사 정보와 내 수강·성적 맥락을 바탕으로, 필요한 안내와 nDRIMS 메뉴를 한 곳에서 찾습니다.</p><div className="hero-actions"><button className="primary">AI Assistant 시작하기</button><button className="secondary">어떻게 작동하나요?</button></div></div><div className="hero-visual"><div className="grid"></div><div className="orb orb-one"></div><div className="orb orb-two"></div><div className="info-card"><span>학생 맞춤 안내</span><strong>Ask anything,<br/>with evidence.</strong><small>공식 출처와 함께 답변합니다</small></div></div></section><section className="trust"><span>공식 학사 정보</span><span>·</span><span>개인정보 최소 처리</span><span>·</span><span>검증된 nDRIMS 이동</span></section><ChatWidget/></main>;
+}

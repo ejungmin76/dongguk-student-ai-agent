@@ -2,6 +2,8 @@ import json
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, StreamingHttpResponse
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from pydantic import ValidationError
 
@@ -23,6 +25,11 @@ def health_check(request):
             "service": "dongguk-student-ai-agent",
         }
     )
+
+
+@ensure_csrf_cookie
+def csrf_token(request):
+    return JsonResponse({"csrf_token": get_token(request)})
 
 
 def api_error(*, code: str, message: str, status: int) -> JsonResponse:
