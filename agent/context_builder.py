@@ -27,7 +27,7 @@ class ContextBudgetError(ValueError):
 class ContextBuilder:
     """Project Tool envelopes into the smallest response-safe common contract."""
 
-    def __init__(self, *, token_budget: int = 2_500) -> None:
+    def __init__(self, *, token_budget: int = 4_000) -> None:
         if token_budget < 256:
             raise ValueError("token_budget must be at least 256")
         self.token_budget = token_budget
