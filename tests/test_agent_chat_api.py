@@ -2,8 +2,7 @@ import json
 from datetime import timedelta
 from unittest.mock import patch
 
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.utils import timezone
 
 from agent.conversation import DjangoConversationStore
@@ -48,8 +47,6 @@ class AgentChatServiceTests(TestCase):
 
 class AgentChatApiTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="api-user", password="password")
-        self.client.force_login(self.user)
         self.runtime = FakeAgentRuntime()
         self.service = AgentChatService(runtime=self.runtime)
         self.service_patch = patch("apps.core.views.agent_chat_service", self.service)
@@ -76,13 +73,9 @@ class AgentChatApiTests(TestCase):
         self.assertEqual(second.status_code, 200)
         self.assertEqual(second.json()["session_id"], first_data["session_id"])
 
-    def test_unauthenticated_invalid_and_wrong_content_type_requests_are_rejected(self):
-        self.client.logout()
-        unauthenticated = self.post({"message": "안녕"})
-        self.assertEqual(unauthenticated.status_code, 401)
-        self.assertEqual(unauthenticated.json()["error"]["code"], "AUTHENTICATION_REQUIRED")
-
-        self.client.force_login(self.user)
+    def test_public_invalid_and_wrong_content_type_requests_are_rejected(self):
+        public = self.post({"message": "안녕"})
+        self.assertEqual(public.status_code, 200)
         invalid = self.post({"message": "", "unexpected": True})
         self.assertEqual(invalid.status_code, 400)
         self.assertEqual(invalid.json()["error"]["code"], "INVALID_REQUEST")
@@ -93,14 +86,17 @@ class AgentChatApiTests(TestCase):
 
     def test_expired_and_foreign_sessions_are_not_exposed(self):
         store = DjangoConversationStore()
-        own = store.create_session(authenticated_subject=f"django-user:{self.user.pk}")
+        self.client.get("/api/csrf/")
+        own = store.create_session(authenticated_subject=f"anonymous-browser:{self.client.session.session_key}")
         own.expires_at = timezone.now() - timedelta(seconds=1)
         own.save(update_fields=["expires_at"])
         expired = self.post({"message": "이어서 질문", "session_id": str(own.session_id)})
         self.assertEqual(expired.status_code, 410)
         self.assertEqual(expired.json()["error"]["code"], "SESSION_EXPIRED")
 
-        other = store.create_session(authenticated_subject="django-user:other")
+        other_client = Client()
+        other_client.get("/api/csrf/")
+        other = store.create_session(authenticated_subject=f"anonymous-browser:{other_client.session.session_key}")
         forbidden = self.post({"message": "남의 세션", "session_id": str(other.session_id)})
         self.assertEqual(forbidden.status_code, 403)
         self.assertEqual(forbidden.json()["error"]["code"], "SESSION_FORBIDDEN")

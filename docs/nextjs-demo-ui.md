@@ -24,10 +24,9 @@ Open `http://localhost:3000`. The development rewrite forwards `/api/*` to
 Django at `127.0.0.1:8000`; no duplicate Node agent API exists.
 
 The widget first requests `/api/csrf/`, then uses the returned token for the
-SSE POST request. For a local authenticated test, sign in to Django Admin at
-`http://127.0.0.1:8000/admin/` before opening the Next.js page. The browser
-session cookie is host-based rather than port-based, so it is sent through the
-development proxy.
+SSE POST request. No login is required in public mode. Django creates an
+opaque browser-session cookie only to protect a visitor's own chat and replay.
+The public Agent never receives a student number, grade, timetable, or profile.
 
 For a deployed version, put Next.js and Django behind one HTTPS origin and
 route `/api/` to Django. Do not expose Gemini or database credentials to the
