@@ -63,3 +63,6 @@ Google ADK + Gemini Agent의 초기 실행 방법과 현재 제한 사항은
 
 질문 문맥을 확인하고 검증 가능한 실행계획 IR로 변환하는 방식은
 [`docs/context-resolver-planner.md`](docs/context-resolver-planner.md)에 정의되어 있습니다.
+
+검증된 Capability를 요청별 ADK FunctionTool에 연결하는 방식은
+[`docs/adk-tool-registry.md`](docs/adk-tool-registry.md)에 정의되어 있습니다.
