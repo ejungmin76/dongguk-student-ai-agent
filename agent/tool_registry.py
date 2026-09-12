@@ -183,7 +183,9 @@ DEFAULT_TOOL_DEFINITIONS = (
     ToolDefinition(
         capability=Capability.NDRIMS_MENU,
         tool_name="find_ndrims_menu",
-        requires_authenticated_student=True,
+        # Menu metadata is public deployment data.  Opening a matched page still
+        # requires the student to authenticate with nDRIMS themselves.
+        requires_authenticated_student=False,
         builder=_ndrims_menu,
     ),
     ToolDefinition(

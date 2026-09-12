@@ -45,7 +45,7 @@ class NdrimsMenuSearchTests(TestCase):
             embedding_model="fake-menu-embedding",
         )
 
-    def test_returns_registered_active_menu_and_navigation_action(self):
+    def test_returns_registered_active_menu_and_verified_open_url_action(self):
         root = self.menu("course-registration", "수강신청", vector(0.9, 0.1))
         target = self.menu("course-registration-history", "수강신청내역확인", vector(1.0), parent=root)
         self.menu("inactive-menu", "비활성", vector(1.0), active=False)
@@ -58,8 +58,8 @@ class NdrimsMenuSearchTests(TestCase):
         self.assertEqual(result.status, ResultStatus.SUCCESS)
         self.assertEqual(result.data.candidates[0].menu_key, target.menu_key)
         self.assertEqual(result.data.candidates[0].breadcrumb, ["수강신청", "수강신청내역확인"])
-        self.assertEqual(result.actions[0].action_type, ActionType.NAVIGATE_NDRIMS_MENU)
-        self.assertIsNone(result.actions[0].url)
+        self.assertEqual(result.actions[0].action_type, ActionType.OPEN_URL)
+        self.assertEqual(str(result.actions[0].url), self.source_url)
         self.assertFalse(result.data.requires_user_selection)
 
     def test_same_named_dormitory_actions_require_user_selection(self):

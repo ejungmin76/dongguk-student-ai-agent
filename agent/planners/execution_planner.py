@@ -24,7 +24,8 @@ execution_planner_agent = Agent(
 - current_schedule: authenticated_student를 사용하고 current_term을 제공할 수 있다.
 - university_knowledge: 일반 학교 질문은 단독 실행할 수 있다. 개인 전공·입학연도
   기준 질문이면 해당 문맥을 제공하는 앞 단계에 의존한다.
-- ndrims_menu: authenticated_student를 사용한다.
+- ndrims_menu: 공개 메뉴 레지스트리만 검색한다. 실제 nDRIMS 화면의 개인 정보는
+  사용자가 해당 사이트에서 직접 로그인해 확인한다.
 - general_response: 외부 문맥을 사용하지 않는다.
 
 question_analysis.capabilities에 없는 Capability를 추가하지 마라. URL, 함수명,

@@ -14,7 +14,7 @@ CAPABILITY_REQUIRED_CONTEXT: dict[Capability, set[ContextField]] = {
     Capability.ACADEMIC_RECORDS: {ContextField.AUTHENTICATED_STUDENT},
     Capability.CURRENT_SCHEDULE: {ContextField.AUTHENTICATED_STUDENT},
     Capability.UNIVERSITY_KNOWLEDGE: set(),
-    Capability.NDRIMS_MENU: {ContextField.AUTHENTICATED_STUDENT},
+    Capability.NDRIMS_MENU: set(),
     Capability.GENERAL_RESPONSE: set(),
 }
 
