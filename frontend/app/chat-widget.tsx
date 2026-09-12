@@ -5,8 +5,8 @@ import { FormEvent, useState } from "react";
 type Detail = { label: string; url?: string };
 type Message = { role: "user" | "assistant"; text: string; details?: Detail[] };
 
-export default function ChatWidget() {
-  const [open, setOpen] = useState(false); const [text, setText] = useState("");
+export default function ChatWidget({ autoOpen = false }: { autoOpen?: boolean }) {
+  const [open, setOpen] = useState(autoOpen); const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]); const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(""); const [error, setError] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
