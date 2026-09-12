@@ -16,10 +16,10 @@ export default function ChatWidget({ autoOpen = false }: { autoOpen?: boolean })
     setText(""); setError(""); setBusy(true); setStatus("답변을 준비하고 있어요…");
     setMessages(current => [...current, {role:"user", text:question}, {role:"assistant", text:""}]);
     try {
-      const csrfResponse = await fetch("/api/csrf/", {cache:"no-store"});
+      const csrfResponse = await fetch("/api/csrf/", {cache:"no-store", credentials:"include"});
       if (!csrfResponse.ok) throw new Error(await readableError(csrfResponse, "Django API에 연결할 수 없습니다."));
       const csrf = await csrfResponse.json();
-      const response = await fetch("/api/chat/stream/", {method:"POST", headers:{"Content-Type":"application/json", "X-CSRFToken":csrf.csrf_token}, body:JSON.stringify({message:question, session_id:sessionId})});
+      const response = await fetch("/api/chat/stream/", {method:"POST", credentials:"include", headers:{"Content-Type":"application/json", "X-CSRFToken":csrf.csrf_token}, body:JSON.stringify({message:question, session_id:sessionId})});
       if (!response.ok || !response.body) throw new Error(await readableError(response, "요청을 처리하지 못했습니다."));
       const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
       while (true) { const {value, done} = await reader.read(); if (done) break; buffer += decoder.decode(value, {stream:true}); const end = buffer.lastIndexOf("\n\n"); if (end < 0) continue; const blocks = buffer.slice(0,end).split("\n\n"); buffer = buffer.slice(end+2); blocks.forEach(block => handleEvent(block)); }
