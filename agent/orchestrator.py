@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
+import logging
 from typing import TypeVar
 from uuid import uuid4
 
@@ -32,6 +33,9 @@ from agent.schemas import (
     ResponseContext,
     ResponseDraft,
     ResultStatus,
+    ContextSource,
+    ContextNeed,
+    ExecutionStep,
     ValidatedResponse,
 )
 from agent.tool_registry import ToolBuildContext
@@ -43,6 +47,7 @@ Planner = Callable[[str, QuestionAnalysis], Awaitable[ExecutionPlan]]
 Responder = Callable[[str, ResponseContext], Awaitable[ResponseDraft]]
 
 NDRIMS_MAIN_URL = "https://ndrims.dongguk.edu/main/main.clx"
+logger = logging.getLogger(__name__)
 
 
 class StructuredAgentRunner:
@@ -172,10 +177,21 @@ class PublicAgentOrchestrator:
 
             # GENERAL_RESPONSE is an answer-writing capability, not a callable Tool.
             executable_analysis = analysis.model_copy(
-                update={"capabilities": executable}
+                update={
+                    "capabilities": executable,
+                    # A generic public question must not inherit a model-requested
+                    # student profile lookup as a hidden prerequisite.
+                    "context_needs": [
+                        need
+                        for need in analysis.context_needs
+                        if need.source != ContextSource.STUDENT_PROFILE
+                    ],
+                }
             )
             context_resolution = resolve_question_context(executable_analysis)
             plan = await self.planner(question, executable_analysis)
+            if plan.needs_clarification:
+                plan = self._public_fallback_plan(executable)
             assert_public_plan(plan)
             execution = await self.executor.execute(
                 plan=plan,
@@ -205,6 +221,7 @@ class PublicAgentOrchestrator:
         except Exception:
             # Browser clients receive a stable, non-technical response.  Detailed
             # errors remain in normal server logging/observability, never in chat.
+            logger.exception("public agent orchestration failed")
             return self._unavailable()
 
     @staticmethod
@@ -221,6 +238,21 @@ class PublicAgentOrchestrator:
                 )
             ],
             limitations=["개인 학사 정보는 공개 서비스에 저장하거나 AI로 처리하지 않습니다."],
+        )
+
+    @staticmethod
+    def _public_fallback_plan(capabilities: list[Capability]) -> ExecutionPlan:
+        """Keep public retrieval useful if the planner over-asks for private context."""
+        return ExecutionPlan(
+            steps=[
+                ExecutionStep(
+                    step_id=f"public_{capability.value}",
+                    capability=capability,
+                    purpose="공개 서버 데이터에서 질문과 관련된 정보를 찾는다.",
+                )
+                for capability in capabilities
+            ],
+            rationale="개인 문맥 없이 공개 Capability만 실행한다.",
         )
 
     @staticmethod
