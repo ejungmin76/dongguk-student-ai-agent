@@ -30,6 +30,14 @@
     row.focus?.();
     row.click();
   };
+  const waitForMenuRow = async (title) => {
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      const row = findMenuRow(title);
+      if (row) return row;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    return undefined;
+  };
   async function openRegisteredMenu(label) {
     const path = label.split(">").map((part) => part.trim()).filter(Boolean);
     const title = path.at(-1);
@@ -39,8 +47,7 @@
       const parent = findMenuRow(path[path.length - 2]);
       if (parent) {
         activateMenuRow(parent);
-        await new Promise((resolve) => setTimeout(resolve, 350));
-        row = findMenuRow(title);
+        row = await waitForMenuRow(title);
       }
     }
     if (!row) return { opened: false, reason: `nDRIMS에서 '${title}' 메뉴를 찾지 못했습니다.` };
