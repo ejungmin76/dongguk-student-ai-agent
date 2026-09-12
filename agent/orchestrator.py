@@ -143,7 +143,13 @@ class PublicAgentOrchestrator:
         try:
             analysis = await self.analyzer(question)
             private_capabilities = set(analysis.capabilities) - PUBLIC_CAPABILITIES
-            if private_capabilities:
+            # A model may over-select an academic capability for a generic policy
+            # question. The intent is the stronger semantic signal: only an
+            # explicitly personal_academic intent crosses the private boundary.
+            personal_intent = any(
+                intent.value == "personal_academic" for intent in analysis.intents
+            )
+            if private_capabilities and personal_intent:
                 return self._personal_data_boundary()
             if analysis.needs_clarification:
                 return ValidatedResponse(
@@ -155,6 +161,7 @@ class PublicAgentOrchestrator:
             executable = [
                 capability
                 for capability in analysis.capabilities
+                if capability in PUBLIC_CAPABILITIES
                 if capability != Capability.GENERAL_RESPONSE
             ]
             if not executable:

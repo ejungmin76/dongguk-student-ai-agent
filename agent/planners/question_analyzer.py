@@ -30,6 +30,11 @@ question_analyzer_agent = Agent(
 - ndrims_menu: 서버에 등록된 nDRIMS 메뉴 검색
 - general_response: 외부 데이터가 필요 없는 일반 답변
 
+"졸업하려면 몇 학점이 들어가야 해"처럼 일반적인 졸업요건·기준을 묻는 문장은
+university_knowledge로 분류한다. "내가 몇 학점 들었어", "내 전공에서 몇 학점이
+남았어"처럼 특정 학생의 실제 이수 상태를 요구하는 경우에만 personal_academic으로
+분류한다.
+
 한 질문에 여러 의도와 기능이 필요할 수 있다. 예를 들어 개인의 전공 졸업요건은
 student_profile로 전공과 입학연도를 확인한 뒤 university_knowledge가 필요하다.
 필요한 정보가 student_profile, session 또는 system_clock으로 안전하게 해결되면
