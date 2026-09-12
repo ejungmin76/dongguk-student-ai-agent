@@ -7,6 +7,7 @@ from .execution_planner import (
     execution_planner_agent,
 )
 from .follow_up_resolver import build_follow_up_resolver_input, follow_up_resolver_agent
+from .query_rewriter import build_query_rewriter_input, query_rewriter_agent
 from .question_analyzer import question_analyzer_agent
 
 __all__ = [
@@ -14,6 +15,8 @@ __all__ = [
     "execution_planner_agent",
     "build_follow_up_resolver_input",
     "follow_up_resolver_agent",
+    "build_query_rewriter_input",
+    "query_rewriter_agent",
     "question_analyzer_agent",
     "resolve_question_context",
 ]

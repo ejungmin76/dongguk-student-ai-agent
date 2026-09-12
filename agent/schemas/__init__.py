@@ -32,10 +32,17 @@ from .tool_execution import (
     StepExecutionState,
     ToolStepExecution,
 )
+from .query_rewrite import (
+    AppliedQueryContext,
+    QueryRewriteProposal,
+    QueryTarget,
+    RewrittenQuery,
+)
 
 __all__ = [
     "ActionReference",
     "ActionType",
+    "AppliedQueryContext",
     "AgentResponse",
     "Capability",
     "ContextField",
@@ -65,6 +72,9 @@ __all__ = [
     "ToolStepExecution",
     "IntentType",
     "QuestionAnalysis",
+    "QueryRewriteProposal",
+    "QueryTarget",
+    "RewrittenQuery",
     "SourceReference",
     "SourceType",
     "ToolResult",
