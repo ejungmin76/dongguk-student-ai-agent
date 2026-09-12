@@ -17,14 +17,19 @@ export default function ChatWidget({ autoOpen = false }: { autoOpen?: boolean })
     setMessages(current => [...current, {role:"user", text:question}, {role:"assistant", text:""}]);
     try {
       const csrfResponse = await fetch("/api/csrf/", {cache:"no-store"});
-      if (!csrfResponse.ok) throw new Error((await csrfResponse.json()).error?.message ?? "Django API에 연결할 수 없습니다.");
+      if (!csrfResponse.ok) throw new Error(await readableError(csrfResponse, "Django API에 연결할 수 없습니다."));
       const csrf = await csrfResponse.json();
       const response = await fetch("/api/chat/stream/", {method:"POST", headers:{"Content-Type":"application/json", "X-CSRFToken":csrf.csrf_token}, body:JSON.stringify({message:question, session_id:sessionId})});
-      if (!response.ok || !response.body) throw new Error((await response.json()).error?.message ?? "요청을 처리하지 못했습니다.");
+      if (!response.ok || !response.body) throw new Error(await readableError(response, "요청을 처리하지 못했습니다."));
       const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
       while (true) { const {value, done} = await reader.read(); if (done) break; buffer += decoder.decode(value, {stream:true}); const end = buffer.lastIndexOf("\n\n"); if (end < 0) continue; const blocks = buffer.slice(0,end).split("\n\n"); buffer = buffer.slice(end+2); blocks.forEach(block => handleEvent(block)); }
     } catch (cause) { setError(cause instanceof Error ? cause.message : "연결이 끊겼습니다."); }
     finally { setBusy(false); setStatus(""); }
+  }
+  async function readableError(response: Response, fallback: string) {
+    const body = await response.text();
+    try { return JSON.parse(body).error?.message ?? fallback; }
+    catch { return fallback; }
   }
   function handleEvent(block: string) {
     const item: Record<string,string> = {}; block.split("\n").forEach(line => { const index=line.indexOf(":"); if(index>0) item[line.slice(0,index)] = line.slice(index+1).trim(); }); const data = item.data ? JSON.parse(item.data) : {};
