@@ -11,7 +11,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import BaseSessionService, InMemorySessionService
 from google.genai import types
 
-from agent.schemas import ResponseContext, ResponseDraft
+from agent.schemas import FallbackDirective, ResponseContext, ResponseDraft
 
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
@@ -36,6 +36,8 @@ response_agent = Agent(
 - Context에 없는 수치, 날짜, 메뉴 경로, 규정, URL 또는 계산 결과를 만들지 않는다.
 - context.status가 partial/unavailable이거나 context.truncated가 true이면 확정할 수
   없는 범위를 limitations에 짧게 밝히고 answer에서도 자연스럽게 한 번 언급한다.
+- fallback_policy.required_limitations가 있으면 모두 limitations에 포함하고 answer에서
+  한 번 자연스럽게 반영한다. 실패의 내부 코드나 기술적 원인은 말하지 않는다.
 - 졸업 가능 여부는 영역별 요건·필수과목까지 주어지지 않았다면 단정하지 않는다.
 - Action이 있으면 질문과 직접 관련 있는 action_id만 action_ids에 넣는다. 메뉴 이동을
   실행하거나 URL을 만들어서는 안 된다.
@@ -55,7 +57,12 @@ response_agent = Agent(
 )
 
 
-def build_response_agent_input(*, question: str, context: ResponseContext) -> str:
+def build_response_agent_input(
+    *,
+    question: str,
+    context: ResponseContext,
+    fallback: FallbackDirective | None = None,
+) -> str:
     """Serialize only answer-safe facts and ID allowlists for the Response Agent."""
 
     return json.dumps(
@@ -86,6 +93,16 @@ def build_response_agent_input(*, question: str, context: ResponseContext) -> st
                 }
                 for action in context.actions
             ],
+            "fallback_policy": (
+                {
+                    "required_limitations": fallback.required_limitations,
+                    "failed_capabilities": [
+                        step.capability for step in fallback.failed_steps
+                    ],
+                }
+                if fallback is not None
+                else None
+            ),
         },
         ensure_ascii=False,
         default=str,
@@ -109,6 +126,7 @@ class ResponseAgentRuntime:
         *,
         question: str,
         context: ResponseContext,
+        fallback: FallbackDirective | None = None,
         user_id: str = "response-user",
         session_id: str | None = None,
     ) -> ResponseDraft:
@@ -126,6 +144,7 @@ class ResponseAgentRuntime:
                         text=build_response_agent_input(
                             question=question,
                             context=context,
+                            fallback=fallback,
                         )
                     )
                 ],

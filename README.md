@@ -78,3 +78,6 @@ Google ADK + Gemini Agent의 초기 실행 방법과 현재 제한 사항은
 
 Gemini 초안의 사실·출처·Action을 서버에서 검증하는 방식은
 [`docs/response-validator.md`](docs/response-validator.md)에 정의되어 있습니다.
+
+Tool 실패·부분 성공·재질문의 안전한 처리 정책은
+[`docs/fallback-policy.md`](docs/fallback-policy.md)에 정의되어 있습니다.

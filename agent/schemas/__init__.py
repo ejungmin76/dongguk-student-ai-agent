@@ -3,6 +3,7 @@
 from .action import ActionReference, ActionType
 from .error import ErrorDetail
 from .execution import ContextResolution, ExecutionPlan, ExecutionStep
+from .fallback import FailedStepSummary, FallbackDirective, FallbackMode
 from .meta import ResultMeta
 from .planning import (
     Capability,
@@ -37,8 +38,11 @@ __all__ = [
     "ContextItem",
     "ContextOmission",
     "ErrorDetail",
+    "FailedStepSummary",
     "ExecutionPlan",
     "ExecutionStep",
+    "FallbackDirective",
+    "FallbackMode",
     "ResultMeta",
     "ResultStatus",
     "ResponseContext",
