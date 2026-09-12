@@ -7,10 +7,12 @@
   <style>html,body,iframe{margin:0;width:100%;height:100%;border:0;overflow:hidden}body{background:#fff}</style>
 </head>
 <body>
-  <iframe title="동국대 AI Assistant" src="http://localhost:3000/embed"></iframe>
+  <iframe id="assistant-frame" title="동국대 AI Assistant" src="http://localhost:3000/embed"></iframe>
   <script>
+    const assistantFrame = document.getElementById("assistant-frame");
     window.addEventListener("message", (event) => {
       if (event.data?.type === "DGU_NDRIMS_ACTION") parent.postMessage(event.data, "*");
+      if (event.data?.type === "DGU_NDRIMS_ACTION_RESULT") assistantFrame.contentWindow.postMessage(event.data, "*");
     });
   </script>
 </body>

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 type Detail = { label: string; url?: string; action?: { actionId: string; path: string } };
 type Message = { role: "user" | "assistant"; text: string; details?: Detail[] };
@@ -8,8 +8,14 @@ type Message = { role: "user" | "assistant"; text: string; details?: Detail[] };
 export default function ChatWidget({ autoOpen = false, extensionMode = false }: { autoOpen?: boolean; extensionMode?: boolean }) {
   const [open, setOpen] = useState(autoOpen); const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]); const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState(""); const [error, setError] = useState("");
+  const [status, setStatus] = useState(""); const [error, setError] = useState(""); const [menuStatus, setMenuStatus] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
+  useEffect(() => {
+    const receive = (event: MessageEvent) => {
+      if (event.data?.type === "DGU_NDRIMS_ACTION_RESULT") setMenuStatus(event.data.opened ? "nDRIMS 메뉴를 열었습니다." : "현재 화면에서 메뉴를 찾지 못했습니다.");
+    };
+    window.addEventListener("message", receive); return () => window.removeEventListener("message", receive);
+  }, []);
 
   async function submit(event?: FormEvent, suggested?: string) {
     event?.preventDefault(); const question = (suggested ?? text).trim(); if (!question || busy) return;
@@ -51,6 +57,6 @@ export default function ChatWidget({ autoOpen = false, extensionMode = false }: 
     if (item.event === "complete" && data.limitations?.length) setMessages(current => current.map((message,index) => index===current.length-1 ? {...message,details:[...(message.details ?? []), ...data.limitations.map((label:string) => ({label}))]} : message));
     if (item.event === "error") setError(data.message ?? "답변을 준비하지 못했습니다.");
   }
-  const openNdrimsAction = (action: { actionId: string; path: string }) => window.parent.postMessage({ type: "DGU_NDRIMS_ACTION", action_id: action.actionId, label: action.path }, "*");
+  const openNdrimsAction = (action: { actionId: string; path: string }) => { setMenuStatus("nDRIMS 메뉴를 여는 중…"); window.parent.postMessage({ type: "DGU_NDRIMS_ACTION", action_id: action.actionId, label: action.path }, "*"); };
   return <><button className="chat-fab" onClick={() => setOpen(true)} aria-label="AI Assistant 열기">✦</button>{open && <div className="widget"><header><div className="agent-mark">D</div><div><strong>동국대 AI Assistant</strong><small>공식 정보 기반 안내</small></div><button onClick={() => setOpen(false)} aria-label="닫기">×</button></header><div className="conversation">{messages.length===0 && <div className="welcome"><h2>무엇을 도와드릴까요?</h2><p>학사 안내와 nDRIMS 메뉴를 빠르게 찾아드릴게요.</p><button onClick={() => submit(undefined,"최대 수강학점이 몇 학점이야?")}>최대 수강학점</button><button onClick={() => submit(undefined,"기숙사 신청 메뉴를 찾아줘")}>기숙사 신청</button></div>}{messages.map((message,index) => <article className={`message ${message.role}`} key={index}><p>{message.text || (busy ? "답변을 작성하고 있어요…" : "")}</p>{message.details?.map((detail,i)=><small key={i}>{detail.action ? <button className="ndrims-action" onClick={() => openNdrimsAction(detail.action!)}>바로가기 열기 · {detail.action.path}</button> : detail.url ? <a href={detail.url} target="_blank" rel="noreferrer">{detail.label}</a> : detail.label}</small>)}</article>)}</div>{status && <div className="stream-status">● {status}</div>}{error && <div className="widget-error">{error}<button onClick={() => submit(undefined, messages.filter(m=>m.role==="user").at(-1)?.text)}>다시 시도</button></div>}<form onSubmit={submit}><textarea value={text} onChange={e=>setText(e.target.value)} placeholder="질문을 입력하세요" maxLength={2000} rows={1}/><button disabled={!text.trim() || busy} aria-label="보내기">↑</button></form><footer>AI 답변은 공식 출처를 확인해 주세요.</footer></div>}</>;
 }

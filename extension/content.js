@@ -18,23 +18,21 @@
   panel.className = "panel"; panel.title = "동국대 AI Assistant"; panel.src = chrome.runtime.getURL("panel.html");
   button.addEventListener("click", () => panel.classList.toggle("open"));
   window.addEventListener("message", (event) => {
-    if (event.source !== panel.contentWindow || event.data?.type !== "DGU_NDRIMS_ACTION") return;
+    const extensionOrigin = `chrome-extension://${chrome.runtime.id}`;
+    if (event.origin !== extensionOrigin || event.data?.type !== "DGU_NDRIMS_ACTION") return;
     const label = String(event.data.label || "");
     const title = label.split(" > ").filter(Boolean).pop();
     if (!title) return;
     const normalize = (value) => value.replace(/\s+/g, "").toLowerCase();
     const target = normalize(title);
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
-    const candidates = [];
-    let node;
-    while ((node = walker.nextNode())) {
-      const element = /** @type {HTMLElement} */ (node);
-      if (!element.offsetParent || element === host || !element.textContent) continue;
-      const text = normalize(element.textContent);
-      if (text === target || (text.length <= target.length + 12 && text.includes(target))) candidates.push(element);
-    }
-    const clickable = candidates.reverse().find((element) => element.matches("button,a,[role=button],li,dt,dd") || typeof element.onclick === "function") || candidates.reverse()[0];
-    if (clickable) { clickable.scrollIntoView({ block: "center" }); clickable.click(); }
+    const candidates = [...document.querySelectorAll("button,a,[role=row],[role=treeitem],[role=button],li,[aria-label],[title]")]
+      .filter((element) => element instanceof HTMLElement && element.offsetParent && element !== host)
+      .filter((element) => [element.textContent, element.getAttribute("aria-label"), element.getAttribute("title")]
+        .some((value) => normalize(value || "") === target));
+    const clickable = candidates.find((element) => element.matches("[role=row],[role=treeitem],button,a,[role=button],li")) || candidates[0];
+    const opened = Boolean(clickable);
+    if (clickable) { clickable.scrollIntoView({ block: "center" }); clickable.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })); }
+    panel.contentWindow?.postMessage({ type: "DGU_NDRIMS_ACTION_RESULT", opened, path: label }, extensionOrigin);
   });
   shadow.append(style, button, panel); document.documentElement.appendChild(host);
 })();
