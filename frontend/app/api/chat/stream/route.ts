@@ -12,13 +12,18 @@ export async function POST(request: Request) {
       body: await request.text(),
       cache: "no-store",
     });
+    const headers = new Headers({
+      "content-type": upstream.headers.get("content-type") ?? "text/event-stream",
+      "cache-control": "no-cache, no-transform",
+      "x-accel-buffering": "no",
+    });
+    // browser_subject() creates Django's anonymous session on the first turn.
+    // Preserve that cookie so subsequent turns keep the same session owner.
+    const cookie = upstream.headers.get("set-cookie");
+    if (cookie) headers.set("set-cookie", cookie);
     return new Response(upstream.body, {
       status: upstream.status,
-      headers: {
-        "content-type": upstream.headers.get("content-type") ?? "text/event-stream",
-        "cache-control": "no-cache, no-transform",
-        "x-accel-buffering": "no",
-      },
+      headers,
     });
   } catch {
     return Response.json(

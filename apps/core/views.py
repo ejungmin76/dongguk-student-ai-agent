@@ -80,12 +80,12 @@ def agent_chat_stream(request):
         payload = ChatRequestSchema.model_validate_json(request.body)
         subject = browser_subject(request)
         run = agent_chat_stream_service.start(authenticated_subject=subject, session_id=str(payload.session_id) if payload.session_id else None)
-    except (ValidationError, ValueError, json.JSONDecodeError):
-        return api_error(code="INVALID_REQUEST", message="message와 선택적 session_id 형식을 확인해 주세요.", status=400)
     except ConversationAccessError:
         return api_error(code="SESSION_FORBIDDEN", message="접근할 수 없는 대화 세션입니다.", status=403)
     except ConversationExpiredError:
         return api_error(code="SESSION_EXPIRED", message="대화 세션이 만료되었습니다. 새 대화를 시작해 주세요.", status=410)
+    except (ValidationError, ValueError, json.JSONDecodeError):
+        return api_error(code="INVALID_REQUEST", message="message와 선택적 session_id 형식을 확인해 주세요.", status=400)
     except ObjectDoesNotExist:
         return api_error(code="SESSION_NOT_FOUND", message="대화 세션을 찾을 수 없습니다.", status=404)
     response = StreamingHttpResponse(agent_chat_stream_service.generate(run_id=run.run_id, authenticated_subject=subject, message=payload.message), content_type="text/event-stream")
