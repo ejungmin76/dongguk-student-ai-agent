@@ -5,7 +5,20 @@ const nextConfig: NextConfig = {
   // `/api/csrf/` to `/api/csrf` before the rewrite can run.
   skipTrailingSlashRedirect: true,
   async rewrites() {
-    return [{ source: "/api/:path*", destination: "http://127.0.0.1:8000/api/:path*" }];
+    const django = "http://127.0.0.1:8000";
+    return [
+      { source: "/api/csrf/", destination: `${django}/api/csrf/` },
+      { source: "/api/chat/", destination: `${django}/api/chat/` },
+      { source: "/api/chat/stream/", destination: `${django}/api/chat/stream/` },
+      {
+        source: "/api/chat/streams/:runId/events/",
+        destination: `${django}/api/chat/streams/:runId/events/`,
+      },
+      {
+        source: "/api/chat/streams/:runId/cancel/",
+        destination: `${django}/api/chat/streams/:runId/cancel/`,
+      },
+    ];
   },
 };
 
