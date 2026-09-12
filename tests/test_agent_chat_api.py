@@ -10,6 +10,7 @@ from agent.conversation import DjangoConversationStore
 from agent.schemas import AgentResponse, ResultStatus
 from apps.conversations.models import ConversationSession, ConversationTurn
 from apps.core.services import AgentChatService
+from apps.core.streaming import AgentChatStreamService
 
 
 class FakeAgentRuntime:
@@ -105,3 +106,29 @@ class AgentChatApiTests(TestCase):
         self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json()["error"]["code"], "AGENT_UNAVAILABLE")
         self.assertNotIn("provider internal detail", response.content.decode())
+
+
+class AgentChatStreamTests(TestCase):
+    def setUp(self):
+        self.subject = "django-user:stream"
+        self.runtime = FakeAgentRuntime()
+        self.chat_service = AgentChatService(runtime=self.runtime)
+        self.stream_service = AgentChatStreamService(chat_service=self.chat_service)
+
+    def test_stream_emits_ordered_lifecycle_and_replays_from_event_id(self):
+        run = self.stream_service.start(authenticated_subject=self.subject, session_id=None)
+        body = b"".join(self.stream_service.generate(run_id=run.run_id, authenticated_subject=self.subject, message="질문")).decode()
+        self.assertIn("event: session", body)
+        self.assertIn("event: progress", body)
+        self.assertIn("event: answer", body)
+        self.assertIn("event: complete", body)
+        replay = self.stream_service.replay(run_id=run.run_id, authenticated_subject=self.subject, after=2)
+        self.assertEqual([event.event_type for event in replay], ["answer", "complete"])
+
+    def test_cancelled_stream_does_not_call_agent_or_persist_answer(self):
+        run = self.stream_service.start(authenticated_subject=self.subject, session_id=None)
+        self.assertTrue(self.stream_service.cancel(run_id=run.run_id, authenticated_subject=self.subject))
+        body = b"".join(self.stream_service.generate(run_id=run.run_id, authenticated_subject=self.subject, message="취소할 질문"))
+        self.assertEqual(body, b"")
+        self.assertEqual(self.runtime.calls, [])
+        self.assertEqual(ConversationTurn.objects.count(), 0)

@@ -90,3 +90,6 @@ Tool 실패·부분 성공·재질문의 안전한 처리 정책은
 
 웹 UI가 사용하는 인증·세션 기반 Chat API 계약은
 [`docs/agent-chat-api.md`](docs/agent-chat-api.md)에 정의되어 있습니다.
+
+실시간 진행 상태·근거·Action 전달과 재연결 규칙은
+[`docs/agent-chat-streaming.md`](docs/agent-chat-streaming.md)에 정의되어 있습니다.

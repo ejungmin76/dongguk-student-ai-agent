@@ -74,3 +74,33 @@ class ConversationTurn(models.Model):
 
     def __str__(self) -> str:
         return f"{self.session_id} #{self.sequence} {self.role}"
+
+
+class ConversationStreamRun(models.Model):
+    class Status(models.TextChoices):
+        RUNNING = "running", "실행 중"
+        COMPLETED = "completed", "완료"
+        CANCELED = "canceled", "취소"
+        FAILED = "failed", "실패"
+
+    run_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(ConversationSession, on_delete=models.CASCADE, related_name="stream_runs")
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.RUNNING)
+    next_sequence = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["session", "created_at"], name="conversatio_session_079069_idx")]
+
+
+class ConversationStreamEvent(models.Model):
+    run = models.ForeignKey(ConversationStreamRun, on_delete=models.CASCADE, related_name="events")
+    sequence = models.PositiveIntegerField()
+    event_type = models.CharField(max_length=24)
+    payload = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["sequence"]
+        constraints = [models.UniqueConstraint(fields=["run", "sequence"], name="conversation_stream_event_sequence_unique")]
